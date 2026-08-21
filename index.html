@@ -568,21 +568,20 @@ button{cursor:pointer;font-weight:600}
 }
 
 
-/* ===== v7: 큰 화면자판 + 세로 화면 비율 재조정 ===== */
+/* ===== v9 모바일 전용: QWERTY + 게임판 확대 + 정보 패널 압축 ===== */
 @media (max-width:700px) and (orientation:portrait){
   html,body{
     width:100%;
     height:100%;
     overflow:hidden !important;
   }
-
   body{
     position:fixed;
     inset:0;
   }
 
   .wrap{
-    width:100%;
+    width:100% !important;
     height:100svh !important;
     min-height:100svh !important;
     max-height:100svh !important;
@@ -590,24 +589,25 @@ button{cursor:pointer;font-weight:600}
     display:grid !important;
     grid-template-rows:auto auto minmax(0,1fr) auto !important;
     padding:
-      calc(3px + var(--safe-top))
-      calc(6px + var(--safe-right))
-      calc(4px + var(--safe-bottom))
-      calc(6px + var(--safe-left)) !important;
+      calc(2px + var(--safe-top))
+      calc(5px + var(--safe-right))
+      calc(3px + var(--safe-bottom))
+      calc(5px + var(--safe-left)) !important;
   }
 
   h1{
-    font-size:16px !important;
-    line-height:1.05 !important;
-    margin:0 0 2px !important;
+    font-size:15.5px !important;
+    line-height:1 !important;
+    margin:0 0 1px !important;
   }
-
   .sub{display:none !important;}
 
-  /* 설정 영역을 더 압축해 게임판/자판에 공간을 양보 */
+  /* 버튼이 하나 줄었으므로 설정 영역도 더 단순화 */
   .toolbar{
+    width:100% !important;
     display:grid !important;
-    grid-template-columns:1.35fr .72fr .68fr .78fr !important;
+    grid-template-columns:1.45fr .72fr .78fr !important;
+    grid-template-rows:auto auto !important;
     gap:3px !important;
     margin:1px 0 3px !important;
   }
@@ -624,226 +624,254 @@ button{cursor:pointer;font-weight:600}
     min-height:29px !important;
     padding:1px 3px !important;
     font-size:10px !important;
-    border-radius:7px !important;
+    border-radius:6px !important;
   }
   #reset{display:none !important;}
   #topic{
     grid-column:1/-1 !important;
+    width:100% !important;
     margin:0 !important;
     padding:0 !important;
     text-align:center !important;
-    font-size:9px !important;
-    line-height:1.05 !important;
+    font-size:8.8px !important;
+    line-height:1 !important;
   }
 
-  /* 게임 + 정보 영역 */
+  /* 게임판을 더 확보 */
   .main{
     width:100% !important;
     min-height:0 !important;
     overflow:hidden !important;
     display:grid !important;
     grid-template-columns:1fr !important;
-    grid-template-rows:minmax(145px,1fr) 64px !important;
+    grid-template-rows:minmax(185px,1fr) 56px !important;
     gap:3px !important;
   }
-
   #game{
+    grid-column:1 !important;
+    grid-row:1 !important;
     width:100% !important;
     min-width:0 !important;
-    min-height:145px !important;
     height:auto !important;
+    min-height:185px !important;
     max-height:none !important;
-    border-radius:9px !important;
+    margin:0 !important;
+    border-radius:8px !important;
   }
-
   .brick{
     max-width:93% !important;
     min-width:82px !important;
     padding:7px 10px !important;
-    font-size:clamp(17px,5.5vw,24px) !important;
+    font-size:clamp(17px,5.6vw,24px) !important;
     line-height:1.15 !important;
   }
 
-  /* 점수와 정답을 낮은 높이의 2분할 바 형태로 */
+  /* 점수/정답 영역: 56px에 핵심정보만 모두 보이게 */
   .main > div:last-child{
+    grid-column:1 !important;
+    grid-row:2 !important;
     width:100% !important;
+    height:56px !important;
     min-width:0 !important;
-    height:64px !important;
     display:grid !important;
-    grid-template-columns:.92fr 1.08fr !important;
+    grid-template-columns:.9fr 1.1fr !important;
     gap:3px !important;
   }
-
   .panel{
-    height:64px !important;
+    height:56px !important;
     min-width:0 !important;
     margin:0 !important;
-    padding:4px 6px !important;
-    border-radius:8px !important;
+    padding:3px 5px !important;
+    border-radius:7px !important;
     overflow:hidden !important;
   }
   .panel:nth-child(3){display:none !important;}
 
   .score{
-    font-size:13px !important;
+    font-size:12.5px !important;
     line-height:1 !important;
-    margin:0 0 2px !important;
+    margin:0 0 1px !important;
   }
   #stats,#combo,#miss,#cycleInfo{
-    font-size:8.2px !important;
-    line-height:1.12 !important;
+    font-size:7.6px !important;
+    line-height:1.08 !important;
+    margin:0 !important;
+  }
+  #miss{
+    display:none !important;
   }
   .answer-jp{
-    font-size:13px !important;
-    line-height:1.05 !important;
-    margin:0 0 2px !important;
-    max-height:16px !important;
+    font-size:12.5px !important;
+    line-height:1 !important;
+    margin:0 0 1px !important;
+    max-height:14px !important;
     overflow:hidden !important;
   }
   #answerKR,#meaning{
-    font-size:8.2px !important;
-    line-height:1.12 !important;
+    font-size:7.8px !important;
+    line-height:1.08 !important;
   }
   .result{
-    font-size:9.8px !important;
+    font-size:9.5px !important;
     line-height:1 !important;
     margin-top:1px !important;
   }
 
-  /* 입력창은 전체 폭. 중복 제출 버튼 제거 */
+  /* 입력 */
   .mobileInputArea{
     width:100% !important;
+    min-width:0 !important;
     margin:3px 0 0 !important;
     padding:0 !important;
   }
-
   .answerRow{
     display:block !important;
     width:100% !important;
   }
-
   .answerRow input{
     width:100% !important;
-    height:34px !important;
-    min-height:34px !important;
-    padding:3px 7px !important;
-    border-radius:8px !important;
+    height:31px !important;
+    min-height:31px !important;
+    padding:2px 6px !important;
     border-width:2px !important;
-    text-align:center !important;
-    font-size:15px !important;
+    border-radius:7px !important;
+    font-size:14px !important;
     background:#fff !important;
+    text-align:center !important;
   }
 
-  /* 7열 자판: iPhone 15 Pro에서 키 폭 약 50px */
+  /* 표준 두벌식 QWERTY 배열 */
   .hangulKeyboard{
     display:block !important;
     width:100% !important;
     margin-top:3px !important;
-    padding:4px !important;
-    border-radius:10px !important;
+    padding:3px !important;
     background:#d7d9de !important;
+    border-radius:9px !important;
     touch-action:manipulation !important;
     user-select:none !important;
     -webkit-user-select:none !important;
   }
 
-  .keyRow.sevenCols{
+  .keyRow{
     display:grid !important;
-    grid-template-columns:repeat(7,minmax(0,1fr)) !important;
-    gap:3px !important;
-    padding:0 !important;
+    gap:2.5px !important;
     margin:0 0 3px !important;
+  }
+  .qrow1{
+    grid-template-columns:repeat(10,minmax(0,1fr)) !important;
+  }
+  .qrow2{
+    grid-template-columns:repeat(9,minmax(0,1fr)) !important;
+    padding:0 4% !important;
+  }
+  .qrow3{
+    grid-template-columns:1.15fr repeat(7,minmax(0,1fr)) 1.15fr !important;
+    padding:0 1.5% !important;
+  }
+  .qrow4{
+    grid-template-columns:.72fr 1.28fr !important;
+    gap:4px !important;
+    margin-bottom:0 !important;
   }
 
   .hkey{
     width:100% !important;
     min-width:0 !important;
-    height:39px !important;
-    min-height:39px !important;
+    height:37px !important;
+    min-height:37px !important;
     padding:0 !important;
     border:0 !important;
-    border-radius:7px !important;
+    border-radius:6px !important;
     background:#fff !important;
-    box-shadow:0 1px 2px rgba(0,0,0,.22) !important;
+    box-shadow:0 1px 2px rgba(0,0,0,.20) !important;
     color:#111 !important;
-    font-size:18px !important;
+    font-size:16px !important;
     font-weight:600 !important;
     touch-action:manipulation !important;
     -webkit-tap-highlight-color:transparent !important;
   }
-
-  .consonantRow .hkey{
-    background:#ffffff !important;
+  .hkey.functionKey{
+    background:#b8bcc5 !important;
+    font-size:15px !important;
   }
-
-  .vowelRow .hkey{
-    background:#f7f9ff !important;
-  }
-
-  .hkey.controlKey{
-    background:#b9bdc6 !important;
-    font-size:17px !important;
-  }
-
   .hkey.clearKey{
     font-size:10px !important;
-    line-height:1 !important;
   }
-
+  .hkey.shiftActive{
+    background:#8fa5c7 !important;
+    color:#fff !important;
+  }
   .hkey.pressed,
   .hkey:active{
     transform:scale(.95) !important;
-    background:#bfc8d8 !important;
+    background:#c4ccd9 !important;
   }
 
   .keyboardSubmit{
-    display:block !important;
     width:100% !important;
-    height:40px !important;
-    min-height:40px !important;
+    height:38px !important;
+    min-height:38px !important;
     margin:0 !important;
     padding:0 !important;
     border:0 !important;
-    border-radius:8px !important;
+    border-radius:7px !important;
     background:#1685e5 !important;
     color:#fff !important;
-    font-size:14px !important;
+    font-size:13px !important;
     font-weight:700 !important;
     touch-action:manipulation !important;
     -webkit-tap-highlight-color:transparent !important;
   }
-
   .keyboardSubmit:active{
-    background:#0f6fc4 !important;
+    background:#0e6fc5 !important;
   }
 
   .version{display:none !important;}
 }
 
-/* iPhone 15 Pro 세로 화면 기준 */
+/* iPhone 15 Pro 세로화면 최적화 */
 @media (width:393px) and (min-height:760px) and (max-height:900px) and (orientation:portrait){
   .main{
-    grid-template-rows:minmax(160px,1fr) 64px !important;
+    grid-template-rows:minmax(205px,1fr) 56px !important;
   }
   .hkey{
-    height:41px !important;
-    min-height:41px !important;
+    height:38px !important;
+    min-height:38px !important;
   }
   .keyboardSubmit{
-    height:41px !important;
-    min-height:41px !important;
+    height:39px !important;
+    min-height:39px !important;
   }
 }
 
-/* 브라우저 UI 때문에 실제 높이가 작은 경우 */
-@media (max-width:700px) and (max-height:690px) and (orientation:portrait){
+/* 브라우저 UI가 크게 차지하는 경우 */
+@media (max-width:700px) and (max-height:700px) and (orientation:portrait){
   h1{font-size:14px !important;}
-  .toolbar select,.toolbar button{height:26px !important;min-height:26px !important;font-size:9px !important;}
-  .main{grid-template-rows:minmax(120px,1fr) 58px !important;}
-  .main > div:last-child,.panel{height:58px !important;}
-  .hkey{height:34px !important;min-height:34px !important;font-size:16px !important;}
-  .keyboardSubmit{height:35px !important;min-height:35px !important;}
-  .answerRow input{height:31px !important;min-height:31px !important;}
+  .toolbar select,.toolbar button{
+    height:26px !important;
+    min-height:26px !important;
+    font-size:9px !important;
+  }
+  .main{
+    grid-template-rows:minmax(150px,1fr) 52px !important;
+  }
+  .main > div:last-child,.panel{
+    height:52px !important;
+  }
+  .hkey{
+    height:33px !important;
+    min-height:33px !important;
+    font-size:14px !important;
+  }
+  .keyboardSubmit{
+    height:34px !important;
+    min-height:34px !important;
+  }
+  .answerRow input{
+    height:28px !important;
+    min-height:28px !important;
+  }
 }
 
 </style>
@@ -872,8 +900,7 @@ button{cursor:pointer;font-weight:600}
       </select>
     </label>
 
-    <button id="start">▶ 시작</button>
-    <button id="pause">Ⅱ 일시정지</button>
+    <button id="control">▶ 시작</button>
     <button id="reset">↻ 초기화</button>
     <strong id="topic"></strong>
   </div>
@@ -910,51 +937,51 @@ button{cursor:pointer;font-weight:600}
       <input id="input" placeholder="화면 자판으로 한글 발음 입력" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="none" readonly>
     </div>
 
-    <div id="hangulKeyboard" class="hangulKeyboard" aria-label="화면 한글 자판">
-      <div class="keyRow sevenCols consonantRow">
-        <button class="hkey" data-key="ㅂ">ㅂ</button>
-        <button class="hkey" data-key="ㅈ">ㅈ</button>
-        <button class="hkey" data-key="ㄷ">ㄷ</button>
-        <button class="hkey" data-key="ㄱ">ㄱ</button>
-        <button class="hkey" data-key="ㅅ">ㅅ</button>
-        <button class="hkey" data-key="ㅁ">ㅁ</button>
-        <button class="hkey" data-key="ㄴ">ㄴ</button>
+    <div id="hangulKeyboard" class="hangulKeyboard" aria-label="두벌식 한글 QWERTY 자판">
+      <div class="keyRow qrow1">
+        <button class="hkey shiftable" data-base="ㅂ" data-shift="ㅃ">ㅂ</button>
+        <button class="hkey shiftable" data-base="ㅈ" data-shift="ㅉ">ㅈ</button>
+        <button class="hkey shiftable" data-base="ㄷ" data-shift="ㄸ">ㄷ</button>
+        <button class="hkey shiftable" data-base="ㄱ" data-shift="ㄲ">ㄱ</button>
+        <button class="hkey shiftable" data-base="ㅅ" data-shift="ㅆ">ㅅ</button>
+        <button class="hkey shiftable" data-base="ㅛ" data-shift="ㅛ">ㅛ</button>
+        <button class="hkey shiftable" data-base="ㅕ" data-shift="ㅕ">ㅕ</button>
+        <button class="hkey shiftable" data-base="ㅑ" data-shift="ㅑ">ㅑ</button>
+        <button class="hkey shiftable" data-base="ㅐ" data-shift="ㅒ">ㅐ</button>
+        <button class="hkey shiftable" data-base="ㅔ" data-shift="ㅖ">ㅔ</button>
       </div>
 
-      <div class="keyRow sevenCols consonantRow">
+      <div class="keyRow qrow2">
+        <button class="hkey" data-key="ㅁ">ㅁ</button>
+        <button class="hkey" data-key="ㄴ">ㄴ</button>
         <button class="hkey" data-key="ㅇ">ㅇ</button>
         <button class="hkey" data-key="ㄹ">ㄹ</button>
         <button class="hkey" data-key="ㅎ">ㅎ</button>
+        <button class="hkey" data-key="ㅗ">ㅗ</button>
+        <button class="hkey" data-key="ㅓ">ㅓ</button>
+        <button class="hkey" data-key="ㅏ">ㅏ</button>
+        <button class="hkey" data-key="ㅣ">ㅣ</button>
+      </div>
+
+      <div class="keyRow qrow3">
+        <button class="hkey functionKey shiftKey" data-action="shift">⇧</button>
         <button class="hkey" data-key="ㅋ">ㅋ</button>
         <button class="hkey" data-key="ㅌ">ㅌ</button>
         <button class="hkey" data-key="ㅊ">ㅊ</button>
         <button class="hkey" data-key="ㅍ">ㅍ</button>
-      </div>
-
-      <div class="keyRow sevenCols vowelRow">
-        <button class="hkey" data-key="ㅛ">ㅛ</button>
-        <button class="hkey" data-key="ㅕ">ㅕ</button>
-        <button class="hkey" data-key="ㅑ">ㅑ</button>
-        <button class="hkey" data-key="ㅐ">ㅐ</button>
-        <button class="hkey" data-key="ㅔ">ㅔ</button>
-        <button class="hkey" data-key="ㅗ">ㅗ</button>
-        <button class="hkey" data-key="ㅓ">ㅓ</button>
-      </div>
-
-      <div class="keyRow sevenCols vowelRow">
-        <button class="hkey" data-key="ㅏ">ㅏ</button>
-        <button class="hkey" data-key="ㅣ">ㅣ</button>
         <button class="hkey" data-key="ㅠ">ㅠ</button>
         <button class="hkey" data-key="ㅜ">ㅜ</button>
         <button class="hkey" data-key="ㅡ">ㅡ</button>
-        <button class="hkey controlKey" data-action="backspace">⌫</button>
-        <button class="hkey controlKey clearKey" data-action="clear">전체삭제</button>
+        <button class="hkey functionKey backspaceKey" data-action="backspace">⌫</button>
       </div>
 
-      <button id="submit" class="keyboardSubmit" data-action="submit">정답 제출</button>
+      <div class="keyRow qrow4">
+        <button class="hkey functionKey clearKey" data-action="clear">전체삭제</button>
+        <button id="submit" class="keyboardSubmit" data-action="submit">정답 제출</button>
+      </div>
     </div>
   </div>
-  <div class="version">v7 · 큰 화면자판 · iPhone 15 Pro · 100문장 / 여행단어100 / 10·15·20초 / 오답 2회 복습</div>
+  <div class="version">v9 · PC v6 기반 · 모바일 QWERTY · 단일 시작버튼</div>
 </div>
 
 <script>
@@ -1053,10 +1080,10 @@ function updateTopic(){
 }
 function updateStats(){
   document.getElementById("score").textContent=`점수 ${score}`;
-  document.getElementById("stats").textContent=`정답 ${correct} / 시도 ${attempts}`;
-  document.getElementById("combo").textContent=`콤보 ${combo} · 최고 ${best}`;
+  document.getElementById("stats").textContent=`정답 ${correct}/${attempts} · 콤보 ${combo}`;
+  document.getElementById("combo").textContent=`최고 ${best} · 시간초과 ${misses}`;
   document.getElementById("miss").textContent=`시간 초과 ${misses}`;
-  document.getElementById("cycleInfo").textContent=`기본 문제 남음 ${baseRemaining} · 오답 복습 남음 ${retryRemaining}`;
+  document.getElementById("cycleInfo").textContent=`남음 ${baseRemaining} · 복습 ${retryRemaining}`;
 }
 function clearFeedback(){
   document.getElementById("answerJP").textContent="—";
@@ -1066,20 +1093,30 @@ function clearFeedback(){
   r.textContent="";
   r.className="result";
 }
-function startGame(){
-  if(running && !paused) return;
+function toggleGameControl(){
+  const btn=document.getElementById("control");
+
   if(!running){
     running=true;
     paused=false;
     if(queue.length===0) buildCycle();
+    btn.textContent="Ⅱ 일시정지";
     spawn();
-  }else{
+    return;
+  }
+
+  if(paused){
     paused=false;
-    document.getElementById("pause").textContent="Ⅱ 일시정지";
+    btn.textContent="Ⅱ 일시정지";
     if(!waiting){
       totalPaused += performance.now()-pauseStarted;
       raf=requestAnimationFrame(loop);
     }
+  }else{
+    paused=true;
+    btn.textContent="▶ 계속";
+    pauseStarted=performance.now();
+    if(raf) cancelAnimationFrame(raf);
   }
 }
 function spawn(){
@@ -1176,20 +1213,9 @@ function reveal(msg,ok,wasWrong){
     if(running&&!paused) spawn();
   },1400);
 }
-function togglePause(){
-  if(!running) return;
-  paused=!paused;
-  document.getElementById("pause").textContent=paused?"▶ 계속":"Ⅱ 일시정지";
-  if(paused){
-    pauseStarted=performance.now();
-    if(raf) cancelAnimationFrame(raf);
-  }else if(!waiting){
-    totalPaused += performance.now()-pauseStarted;
-    raf=requestAnimationFrame(loop);
-  }
-}
 function resetGame(){
   running=false; paused=false; waiting=false;
+  document.getElementById("control").textContent="▶ 시작";
   if(raf) cancelAnimationFrame(raf);
   queue=[]; baseRemaining=0; retryRemaining=0; cycleNo=0;
   score=0; combo=0; best=0; correct=0; attempts=0; misses=0;
@@ -1201,6 +1227,7 @@ function resetGame(){
 function changeMode(){
   if(raf) cancelAnimationFrame(raf);
   running=false;paused=false;waiting=false;
+  document.getElementById("control").textContent="▶ 시작";
   queue=[];baseRemaining=0;retryRemaining=0;cycleNo=0;
   game.innerHTML="";
   clearFeedback();
@@ -1218,8 +1245,7 @@ function changeDuration(){
   }
 }
 
-document.getElementById("start").onclick=startGame;
-document.getElementById("pause").onclick=togglePause;
+document.getElementById("control").onclick=toggleGameControl;
 document.getElementById("reset").onclick=resetGame;
 document.getElementById("submit").onclick=submit;
 document.getElementById("mode").onchange=changeMode;
@@ -1392,37 +1418,58 @@ function imeSetText(t){
   renderIme();
 }
 
-function handleKeyboardButton(btn){
-  const key=btn.dataset.key;
-  const action=btn.dataset.action;
+let keyboardShift=false;
 
-  if(key){
-    typeJamo(key);
+function updateShiftKeys(){
+  document.querySelectorAll("#hangulKeyboard .shiftable").forEach(btn=>{
+    const value=keyboardShift ? btn.dataset.shift : btn.dataset.base;
+    btn.textContent=value;
+    btn.dataset.key=value;
+  });
+  const shiftBtn=document.querySelector("#hangulKeyboard .shiftKey");
+  if(shiftBtn) shiftBtn.classList.toggle("shiftActive",keyboardShift);
+}
+
+function keyboardAction(btn){
+  const action=btn.dataset.action;
+  const key=btn.dataset.key;
+
+  if(action==="shift"){
+    keyboardShift=!keyboardShift;
+    updateShiftKeys();
   }else if(action==="backspace"){
     imeBackspace();
   }else if(action==="clear"){
     imeClear();
   }else if(action==="submit"){
     submit();
+  }else if(key){
+    typeJamo(key);
+    if(keyboardShift){
+      keyboardShift=false;
+      updateShiftKeys();
+    }
   }
 
   btn.classList.add("pressed");
-  setTimeout(()=>btn.classList.remove("pressed"),90);
+  setTimeout(()=>btn.classList.remove("pressed"),80);
 }
 
 document.querySelectorAll("#hangulKeyboard .hkey, #hangulKeyboard .keyboardSubmit").forEach(btn=>{
   if(window.PointerEvent){
     btn.addEventListener("pointerdown",e=>{
       e.preventDefault();
-      handleKeyboardButton(btn);
+      keyboardAction(btn);
     },{passive:false});
   }else{
     btn.addEventListener("touchend",e=>{
       e.preventDefault();
-      handleKeyboardButton(btn);
+      keyboardAction(btn);
     },{passive:false});
   }
 });
+
+updateShiftKeys();
 
 // 모바일에서는 시스템 키보드를 절대 띄우지 않음
 input.addEventListener("focus",()=>{
