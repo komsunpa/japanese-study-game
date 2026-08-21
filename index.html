@@ -1,0 +1,816 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>일본어 벽돌게임</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="일본어 벽돌게임">
+<meta name="theme-color" content="#f3f4f6">
+<style>
+  body{font-family:"Malgun Gothic","Yu Gothic UI",sans-serif;margin:0;background:#f3f4f6;color:#111}
+  .wrap{max-width:1100px;margin:0 auto;padding:18px}
+  h1{margin:0 0 6px;font-size:28px}
+  .sub{color:#555;margin-bottom:14px}
+  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+  select,button,input{font:inherit}
+  select,button{padding:8px 10px}
+  button{cursor:pointer}
+  .main{display:grid;grid-template-columns:1fr 300px;gap:16px}
+  #game{position:relative;height:540px;background:white;border:2px solid #333;overflow:hidden;border-radius:8px}
+  .brick{position:absolute;left:50%;transform:translateX(-50%);padding:16px 26px;border:2px solid #333;background:#fafafa;border-radius:10px;font-size:34px;font-weight:700;white-space:nowrap}
+  .panel{background:white;border:1px solid #ccc;border-radius:8px;padding:14px;margin-bottom:12px}
+  .score{font-size:26px;font-weight:700}
+  .answer-jp{font-size:26px;font-weight:700;margin-bottom:8px}
+  .result{font-size:20px;font-weight:700;margin-top:10px}
+  .bottom{display:flex;gap:10px;margin-top:14px}
+  .bottom input{flex:1;padding:12px;font-size:24px;text-align:center}
+  .bottom button{width:130px;font-weight:700}
+  .ok{color:#087f23}.bad{color:#c92a2a}
+  .small{font-size:14px;line-height:1.55;color:#444}
+  @media(max-width:850px){.main{grid-template-columns:1fr}#game{height:430px}}
+
+  /* ===== iPhone 15 Pro / iOS Chrome 최적화 ===== */
+  :root{
+    --vvh: 100dvh;
+    --kb-offset: 0px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
+  }
+
+  html,body{
+    margin:0;
+    width:100%;
+    min-height:100%;
+    overscroll-behavior:none;
+    -webkit-text-size-adjust:100%;
+    touch-action:manipulation;
+  }
+
+  body{
+    padding:0;
+    background:#eef0f3;
+  }
+
+  button,select,input{
+    font-family:"Malgun Gothic","Apple SD Gothic Neo","Yu Gothic UI",sans-serif;
+  }
+
+  @media (max-width: 430px){
+    .wrap{
+      width:100%;
+      max-width:none;
+      box-sizing:border-box;
+      padding:
+        calc(6px + var(--safe-top))
+        calc(8px + var(--safe-right))
+        calc(82px + var(--safe-bottom))
+        calc(8px + var(--safe-left));
+    }
+
+    h1{
+      margin:0;
+      font-size:20px;
+      line-height:1.2;
+      text-align:center;
+    }
+
+    .sub{
+      margin:2px 0 6px;
+      font-size:11px;
+      line-height:1.3;
+      text-align:center;
+      color:#666;
+    }
+
+    .toolbar{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:5px;
+      margin:0 0 6px;
+      align-items:end;
+    }
+
+    .toolbar label{
+      grid-column:span 1;
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      min-width:0;
+      font-size:10px;
+      color:#555;
+    }
+
+    .toolbar label:first-child{
+      grid-column:1 / 3;
+    }
+
+    .toolbar label:nth-child(2){
+      grid-column:3;
+    }
+
+    .toolbar select{
+      width:100%;
+      min-width:0;
+      height:38px;
+      padding:5px 7px;
+      border:1px solid #aaa;
+      border-radius:9px;
+      background:#fff;
+      font-size:13px;
+    }
+
+    .toolbar button{
+      min-height:40px;
+      padding:5px 4px;
+      border-radius:9px;
+      font-size:13px;
+      white-space:nowrap;
+    }
+
+    #topic{
+      grid-column:1 / -1;
+      text-align:center;
+      font-size:12px;
+      line-height:1.2;
+      padding:0 0 1px;
+    }
+
+    .main{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    #game{
+      order:1;
+      width:100%;
+      height:clamp(330px, 49dvh, 425px);
+      min-height:330px;
+      max-height:425px;
+      box-sizing:border-box;
+      border-width:1px;
+      border-radius:12px;
+      background:#fff;
+    }
+
+    .brick{
+      max-width:90%;
+      box-sizing:border-box;
+      padding:11px 17px;
+      border-radius:10px;
+      font-size:clamp(25px, 8vw, 34px);
+      line-height:1.15;
+      text-align:center;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .main > div:last-child{
+      order:2;
+      display:grid;
+      grid-template-columns:0.9fr 1.1fr;
+      gap:6px;
+      width:100%;
+    }
+
+    .panel{
+      margin:0;
+      padding:8px 9px;
+      border-radius:10px;
+    }
+
+    .panel:nth-child(1){ grid-column:1; }
+    .panel:nth-child(2){ grid-column:2; }
+    .panel:nth-child(3){ display:none; }
+
+    .score{
+      font-size:18px;
+      line-height:1.15;
+      margin-bottom:3px;
+    }
+
+    #stats,#combo,#miss,#cycle{
+      font-size:11px;
+      line-height:1.35;
+    }
+
+    .answer-jp{
+      font-size:19px;
+      line-height:1.15;
+      margin-bottom:3px;
+    }
+
+    #answerKR,#meaning{
+      font-size:11px;
+      line-height:1.35;
+    }
+
+    .result{
+      margin-top:4px;
+      font-size:14px;
+      line-height:1.2;
+    }
+
+    .bottom{
+      position:fixed;
+      z-index:9999;
+      left:0;
+      right:0;
+      bottom:var(--kb-offset);
+      margin:0;
+      padding:
+        7px
+        calc(8px + var(--safe-right))
+        calc(7px + var(--safe-bottom))
+        calc(8px + var(--safe-left));
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 94px;
+      gap:7px;
+      background:rgba(255,255,255,.97);
+      border-top:1px solid #bbb;
+      box-shadow:0 -3px 12px rgba(0,0,0,.10);
+      box-sizing:border-box;
+    }
+
+    .bottom > label{
+      display:none;
+    }
+
+    .bottom input{
+      width:100%;
+      min-width:0;
+      height:48px;
+      box-sizing:border-box;
+      padding:9px 10px;
+      border:2px solid #555;
+      border-radius:12px;
+      font-size:18px; /* iOS 자동 확대 방지 */
+      text-align:center;
+    }
+
+    .bottom button{
+      width:94px;
+      min-height:48px;
+      border-radius:12px;
+      padding:5px;
+      font-size:14px;
+      font-weight:700;
+    }
+
+    body.keyboard-open .wrap{
+      padding-bottom:calc(74px + var(--safe-bottom));
+    }
+
+    body.keyboard-open h1,
+    body.keyboard-open .sub{
+      display:none;
+    }
+
+    body.keyboard-open .toolbar{
+      grid-template-columns:1fr 1fr 1fr;
+      margin-bottom:4px;
+    }
+
+    body.keyboard-open .toolbar label{
+      display:none;
+    }
+
+    body.keyboard-open #topic{
+      display:none;
+    }
+
+    body.keyboard-open #game{
+      height:clamp(220px, 36dvh, 300px);
+      min-height:220px;
+      max-height:300px;
+    }
+
+    body.keyboard-open .main > div:last-child{
+      grid-template-columns:1fr 1fr;
+    }
+
+    body.keyboard-open .panel{
+      padding:6px 8px;
+    }
+
+    body.keyboard-open .score{font-size:16px;}
+    body.keyboard-open #stats,
+    body.keyboard-open #combo,
+    body.keyboard-open #miss,
+    body.keyboard-open #cycle,
+    body.keyboard-open #answerKR,
+    body.keyboard-open #meaning{font-size:10px;}
+    body.keyboard-open .answer-jp{font-size:17px;}
+    body.keyboard-open .result{font-size:12px;}
+
+    @media (max-height: 740px){
+      #game{
+        height:42dvh;
+        min-height:280px;
+      }
+    }
+  }
+
+  /* iPhone 15 Pro portrait target: 393 x 852 CSS px */
+  @media (width:393px) and (min-height:800px) and (max-height:900px){
+    #game{
+      height:418px;
+    }
+    .wrap{
+      padding-top:calc(5px + var(--safe-top));
+    }
+  }
+
+  @media (max-width: 900px) and (orientation: landscape){
+    .wrap{
+      padding:
+        calc(4px + var(--safe-top))
+        calc(7px + var(--safe-right))
+        calc(76px + var(--safe-bottom))
+        calc(7px + var(--safe-left));
+    }
+
+    h1,.sub{
+      display:none;
+    }
+
+    .toolbar{
+      grid-template-columns:150px 90px repeat(3,1fr);
+      gap:5px;
+      margin-bottom:5px;
+    }
+
+    .toolbar label:first-child,
+    .toolbar label:nth-child(2){
+      grid-column:auto;
+    }
+
+    #topic{
+      display:none;
+    }
+
+    .main{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 235px;
+      gap:7px;
+    }
+
+    #game{
+      height:calc(var(--vvh) - 132px);
+      min-height:235px;
+      max-height:none;
+    }
+
+    .main > div:last-child{
+      display:block;
+    }
+
+    .panel{
+      margin-bottom:6px;
+    }
+
+    .panel:nth-child(3){
+      display:none;
+    }
+  }
+
+</style>
+
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="일본어 벽돌게임">
+
+</head>
+<body>
+
+<div id="pwaInstallHint" style="display:none;position:fixed;z-index:10001;left:10px;right:10px;top:calc(8px + env(safe-area-inset-top));background:#111;color:#fff;border-radius:12px;padding:10px 38px 10px 12px;font-size:12px;line-height:1.45;box-shadow:0 4px 18px rgba(0,0,0,.25);">
+  <b>앱처럼 사용하기</b><br>
+  iPhone에서는 브라우저의 공유 메뉴에서 <b>홈 화면에 추가</b>를 선택하세요. 한 번 추가하면 전체화면으로 실행되고 오프라인에서도 사용할 수 있습니다.
+  <button id="closePwaHint" aria-label="닫기" style="position:absolute;right:8px;top:6px;border:0;background:transparent;color:#fff;font-size:24px;line-height:1;">×</button>
+</div>
+
+<div class="wrap">
+  <h1>日本語 벽돌게임</h1>
+  <div class="sub">떠 있는 일본어를 보고 한글 발음을 입력하세요. 맞든 틀리든 정답과 뜻을 보여줍니다.</div>
+
+  <div class="toolbar">
+    <label>모드
+      <select id="mode">
+        <option>오늘의 학습</option>
+        <option>히라가나</option>
+        <option>가타카나</option>
+        <option>여행 단어</option>
+        <option>전체 혼합</option>
+      </select>
+    </label>
+    <label>낙하 시간 <select id="difficulty"><option selected>15초</option></select></label>
+    <button id="start">▶ 시작</button>
+    <button id="pause">Ⅱ 일시정지</button>
+    <button id="reset">↻ 초기화</button>
+    <strong id="topic"></strong>
+  </div>
+
+  <div class="main">
+    <div id="game"></div>
+    <div>
+      <div class="panel">
+        <div class="score" id="score">점수 0</div>
+        <div id="stats">정답 0 / 시도 0</div>
+        <div id="combo">콤보 0 · 최고 0</div>
+        <div id="miss">바닥 놓침 0</div>
+        <div id="cycle">현재 사이클 남은 문제 —</div>
+      </div>
+      <div class="panel">
+        <div class="answer-jp" id="answerJP">—</div>
+        <div id="answerKR">발음: —</div>
+        <div id="meaning">뜻: —</div>
+        <div class="result" id="result"></div>
+      </div>
+      <div class="panel small">
+        <b>학습 팁</b><br>
+        • 틀려도 정답을 바로 보여줍니다.<br>
+        • 바닥에 닿아도 정답을 보여줍니다.<br>
+        • Enter = 제출, Space = 일시정지<br>
+        • 오늘의 학습은 날짜별로 주제가 바뀝니다.<br>        • 일본어가 화면 위에서 바닥까지 내려오는 시간은 15초입니다.<br>        • 한 사이클이 끝날 때까지 같은 문제는 다시 나오지 않습니다.<br>        • 모든 문제가 한 번씩 나온 뒤에만 다시 섞어서 출제합니다.
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <input id="input" placeholder="한글 발음 입력" autocomplete="off">
+    <button id="submit">제출 Enter</button>
+  </div>
+</div>
+
+<script>
+const hira = [
+["あ","아"],["い","이"],["う","우"],["え","에"],["お","오"],
+["か","카"],["き","키"],["く","쿠"],["け","케"],["こ","코"],
+["さ","사"],["し","시"],["す","스"],["せ","세"],["そ","소"],
+["た","타"],["ち","치"],["つ","츠"],["て","테"],["と","토"],
+["な","나"],["に","니"],["ぬ","누"],["ね","네"],["の","노"],
+["は","하"],["ひ","히"],["ふ","후"],["へ","헤"],["ほ","호"],
+["ま","마"],["み","미"],["む","무"],["め","메"],["も","모"],
+["や","야"],["ゆ","유"],["よ","요"],
+["ら","라"],["り","리"],["る","루"],["れ","레"],["ろ","로"],
+["わ","와"],["を","오"],["ん","응"],
+["が","가"],["ぎ","기"],["ぐ","구"],["げ","게"],["ご","고"],
+["ざ","자"],["じ","지"],["ず","즈"],["ぜ","제"],["ぞ","조"],
+["だ","다"],["ぢ","지"],["づ","즈"],["で","데"],["ど","도"],
+["ば","바"],["び","비"],["ぶ","부"],["べ","베"],["ぼ","보"],
+["ぱ","파"],["ぴ","피"],["ぷ","푸"],["ぺ","페"],["ぽ","포"]
+].map(x=>({display:x[0],answers:[x[1]],meaning:`히라가나 ${x[0]}`,category:"히라가나"}));
+
+const kata = [
+["ア","아"],["イ","이"],["ウ","우"],["エ","에"],["オ","오"],
+["カ","카"],["キ","키"],["ク","쿠"],["ケ","케"],["コ","코"],
+["サ","사"],["シ","시"],["ス","스"],["セ","세"],["ソ","소"],
+["タ","타"],["チ","치"],["ツ","츠"],["テ","테"],["ト","토"],
+["ナ","나"],["ニ","니"],["ヌ","누"],["ネ","네"],["ノ","노"],
+["ハ","하"],["ヒ","히"],["フ","후"],["ヘ","헤"],["ホ","호"],
+["マ","마"],["ミ","미"],["ム","무"],["メ","메"],["モ","모"],
+["ヤ","야"],["ユ","유"],["ヨ","요"],
+["ラ","라"],["リ","리"],["ル","루"],["レ","레"],["ロ","로"],
+["ワ","와"],["ヲ","오"],["ン","응"]
+].map(x=>({display:x[0],answers:[x[1]],meaning:`가타카나 ${x[0]}`,category:"가타카나"}));
+
+const vocab = [
+{display:"いち",answers:["이치"],meaning:"1, 하나",category:"숫자"},
+{display:"に",answers:["니"],meaning:"2, 둘",category:"숫자"},
+{display:"さん",answers:["산"],meaning:"3, 셋",category:"숫자"},
+{display:"よん",answers:["욘"],meaning:"4, 넷",category:"숫자"},
+{display:"ご",answers:["고"],meaning:"5, 다섯",category:"숫자"},
+{display:"ろく",answers:["로쿠"],meaning:"6, 여섯",category:"숫자"},
+{display:"なな",answers:["나나"],meaning:"7, 일곱",category:"숫자"},
+{display:"はち",answers:["하치"],meaning:"8, 여덟",category:"숫자"},
+{display:"きゅう",answers:["큐","큐우"],meaning:"9, 아홉",category:"숫자"},
+{display:"じゅう",answers:["쥬","주","쥬우","주우"],meaning:"10, 열",category:"숫자"},
+
+{display:"げつようび",answers:["게츠요비","게츠요우비"],meaning:"월요일",category:"요일·시간"},
+{display:"かようび",answers:["카요비","카요우비"],meaning:"화요일",category:"요일·시간"},
+{display:"すいようび",answers:["스이요비","스이요우비"],meaning:"수요일",category:"요일·시간"},
+{display:"もくようび",answers:["모쿠요비","모쿠요우비"],meaning:"목요일",category:"요일·시간"},
+{display:"きんようび",answers:["킨요비","킨요우비"],meaning:"금요일",category:"요일·시간"},
+{display:"どようび",answers:["도요비","도요우비"],meaning:"토요일",category:"요일·시간"},
+{display:"にちようび",answers:["니치요비","니치요우비"],meaning:"일요일",category:"요일·시간"},
+{display:"いま",answers:["이마"],meaning:"지금",category:"요일·시간"},
+{display:"なんじ",answers:["난지"],meaning:"몇 시",category:"요일·시간"},
+{display:"じかん",answers:["지칸"],meaning:"시간",category:"요일·시간"},
+
+{display:"タクシー",answers:["타쿠시","타쿠시이"],meaning:"택시",category:"교통"},
+{display:"えき",answers:["에키"],meaning:"역",category:"교통"},
+{display:"くうこう",answers:["쿠코","쿠우코우","쿠코우"],meaning:"공항",category:"교통"},
+{display:"のりば",answers:["노리바"],meaning:"승강장, 타는 곳",category:"교통"},
+{display:"でんしゃ",answers:["덴샤"],meaning:"전철, 기차",category:"교통"},
+{display:"バス",answers:["바스"],meaning:"버스",category:"교통"},
+{display:"とめてください",answers:["토메테쿠다사이"],meaning:"세워 주세요",category:"교통"},
+
+{display:"みぎ",answers:["미기"],meaning:"오른쪽",category:"방향"},
+{display:"ひだり",answers:["히다리"],meaning:"왼쪽",category:"방향"},
+{display:"まっすぐ",answers:["맛스구","맛수구"],meaning:"똑바로, 직진",category:"방향"},
+{display:"まえ",answers:["마에"],meaning:"앞",category:"방향"},
+{display:"うしろ",answers:["우시로"],meaning:"뒤",category:"방향"},
+{display:"となり",answers:["토나리"],meaning:"옆, 이웃",category:"방향"},
+
+{display:"みず",answers:["미즈"],meaning:"물",category:"음식"},
+{display:"ごはん",answers:["고한"],meaning:"밥, 식사",category:"음식"},
+{display:"にく",answers:["니쿠"],meaning:"고기",category:"음식"},
+{display:"さかな",answers:["사카나"],meaning:"생선",category:"음식"},
+{display:"やさい",answers:["야사이"],meaning:"채소",category:"음식"},
+{display:"ビール",answers:["비루","비이루"],meaning:"맥주",category:"음식"},
+{display:"おいしい",answers:["오이시이"],meaning:"맛있다",category:"음식"},
+{display:"メニュー",answers:["메뉴","메뉴우"],meaning:"메뉴",category:"음식"},
+{display:"いくらですか",answers:["이쿠라데스카"],meaning:"얼마입니까?",category:"음식"},
+
+{display:"うれしい",answers:["우레시이"],meaning:"기쁘다",category:"감정·일상"},
+{display:"たのしい",answers:["타노시이"],meaning:"즐겁다",category:"감정·일상"},
+{display:"つかれた",answers:["츠카레타"],meaning:"피곤하다",category:"감정·일상"},
+{display:"ねむい",answers:["네무이"],meaning:"졸리다",category:"감정·일상"},
+{display:"たべる",answers:["타베루"],meaning:"먹다",category:"감정·일상"},
+{display:"のむ",answers:["노무"],meaning:"마시다",category:"감정·일상"},
+
+{display:"こんにちは",answers:["곤니치와","콘니치와"],meaning:"안녕하세요",category:"여행회화"},
+{display:"ありがとう",answers:["아리가토","아리가토우"],meaning:"고마워요",category:"여행회화"},
+{display:"すみません",answers:["스미마센"],meaning:"실례합니다 / 죄송합니다 / 저기요",category:"여행회화"},
+{display:"おねがいします",answers:["오네가이시마스"],meaning:"부탁합니다",category:"여행회화"},
+{display:"わかりません",answers:["와카리마센"],meaning:"모르겠습니다",category:"여행회화"},
+{display:"もういちど",answers:["모이치도","모우이치도"],meaning:"한 번 더",category:"여행회화"},
+
+{display:"かいぎ",answers:["카이기"],meaning:"회의",category:"비즈니스"},
+{display:"よてい",answers:["요테이"],meaning:"예정",category:"비즈니스"},
+{display:"しりょう",answers:["시료","시료우"],meaning:"자료",category:"비즈니스"},
+{display:"かくにん",answers:["카쿠닌"],meaning:"확인",category:"비즈니스"},
+{display:"れんらく",answers:["렌라쿠"],meaning:"연락",category:"비즈니스"}
+];
+
+const topics=["숫자","요일·시간","교통","방향","음식","감정·일상","여행회화","비즈니스"];
+const DROP_DURATION = 15000; // 화면 위에서 바닥까지 정확히 15초
+
+const game=document.getElementById("game"), input=document.getElementById("input");
+let running=false,paused=false,current=null,brick=null,y=0,lastTime=0,spawnTime=0,pauseStarted=0,totalPaused=0,raf=null,waiting=false;
+let questionDeck=[];
+let deckKey="";
+let lastDisplay="";
+let score=0,combo=0,best=0,correct=0,attempts=0,misses=0;
+
+function dayTopic(){
+  const d=new Date();
+  const n=Math.floor(d.getTime()/86400000);
+  return topics[n%topics.length];
+}
+function updateTopic(){
+  document.getElementById("topic").textContent =
+    document.getElementById("mode").value==="오늘의 학습" ? "오늘 주제: "+dayTopic() : "선택 모드: "+document.getElementById("mode").value;
+}
+function pool(){
+  const m=document.getElementById("mode").value;
+  if(m==="히라가나") return hira;
+  if(m==="가타카나") return kata;
+  if(m==="여행 단어") return vocab.filter(v=>["교통","방향","음식","여행회화","요일·시간"].includes(v.category));
+  if(m==="오늘의 학습"){
+    const p=vocab.filter(v=>v.category===dayTopic());
+    return p.length?p:vocab;
+  }
+  return [...hira,...kata,...vocab];
+}
+function norm(s){return (s||"").trim().toLowerCase().replace(/[\s\-._,!?~·'"()]/g,"");}
+
+function shuffleArray(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function currentDeckKey(){
+  return document.getElementById("mode").value + "|" + dayTopic();
+}
+
+function resetQuestionDeck(){
+  questionDeck=[];
+  deckKey=currentDeckKey();
+}
+
+function nextQuestion(){
+  const key=currentDeckKey();
+
+  if(deckKey!==key){
+    resetQuestionDeck();
+  }
+
+  // 화면에 같은 일본어가 중복되어 보이지 않도록 display 기준으로 한 번 더 정리
+  if(questionDeck.length===0){
+    const uniquePool=[];
+    const seen=new Set();
+
+    for(const item of pool()){
+      if(!seen.has(item.display)){
+        seen.add(item.display);
+        uniquePool.push(item);
+      }
+    }
+
+    questionDeck=shuffleArray(uniquePool);
+
+    // 새 사이클 첫 문제와 직전 사이클 마지막 문제가 같은 경우 자리 교환
+    if(questionDeck.length>1 && questionDeck[questionDeck.length-1].display===lastDisplay){
+      const swapIndex=Math.floor(Math.random()*(questionDeck.length-1));
+      [questionDeck[questionDeck.length-1],questionDeck[swapIndex]]=
+      [questionDeck[swapIndex],questionDeck[questionDeck.length-1]];
+    }
+  }
+
+  const q=questionDeck.pop();
+  lastDisplay=q.display;
+  return q;
+}
+
+function spawn(){
+  if(!running||paused)return;
+  game.innerHTML="";
+  current=nextQuestion();
+  brick=document.createElement("div");
+  brick.className="brick";
+  brick.textContent=current.display;
+  brick.style.left=(18+Math.random()*64)+"%";
+  brick.style.top="0px";
+  game.appendChild(brick);
+  y=0; waiting=false; totalPaused=0; spawnTime=performance.now(); lastTime=spawnTime; input.value=""; input.focus();
+  raf=requestAnimationFrame(loop);
+}
+function loop(t){
+  if(!running||paused||waiting)return;
+
+  const elapsed = t - spawnTime - totalPaused;
+  const maxY = game.clientHeight - brick.offsetHeight - 4;
+  const progress = Math.min(elapsed / DROP_DURATION, 1);
+
+  y = maxY * progress;
+  brick.style.top = y + "px";
+
+  if(progress >= 1){
+    misses++;
+    combo = 0;
+    reveal("시간 초과", false);
+    return;
+  }
+
+  raf = requestAnimationFrame(loop);
+}
+function reveal(msg,ok){
+  waiting=true;
+  if(raf)cancelAnimationFrame(raf);
+  document.getElementById("answerJP").textContent=current.display;
+  document.getElementById("answerKR").textContent="발음: "+current.answers.join(" / ");
+  document.getElementById("meaning").textContent="뜻: "+current.meaning;
+  const r=document.getElementById("result"); r.textContent=msg; r.className="result "+(ok?"ok":"bad");
+  updateStats();
+  setTimeout(()=>{ if(running&&!paused)spawn(); },1150);
+}
+function submit(){
+  if(!running||paused||waiting||!current)return;
+  const a=norm(input.value); if(!a)return;
+  attempts++;
+  const ok=current.answers.map(norm).includes(a);
+  if(ok){correct++;combo++;best=Math.max(best,combo);const gain=100+Math.min(combo,20)*10;score+=gain;reveal("정답! +"+gain,true);}
+  else{combo=0;score=Math.max(0,score-20);reveal("틀렸습니다",false);}
+}
+function updateStats(){
+  document.getElementById("score").textContent="점수 "+score;
+  document.getElementById("stats").textContent=`정답 ${correct} / 시도 ${attempts}`;
+  document.getElementById("combo").textContent=`콤보 ${combo} · 최고 ${best}`;
+  document.getElementById("miss").textContent=`바닥 놓침 ${misses}`;
+  document.getElementById("cycle").textContent=`현재 사이클 남은 문제 ${questionDeck.length}`;
+}
+document.getElementById("start").onclick=()=>{if(running&&!paused)return;running=true;paused=false;spawn();};
+document.getElementById("pause").onclick=()=>{
+  if(!running)return;
+  paused=!paused;
+  document.getElementById("pause").textContent=paused?"▶ 계속":"Ⅱ 일시정지";
+
+  if(paused){
+    pauseStarted = performance.now();
+    if(raf) cancelAnimationFrame(raf);
+  }else if(!waiting){
+    totalPaused += performance.now() - pauseStarted;
+    raf=requestAnimationFrame(loop);
+  }
+};
+document.getElementById("reset").onclick=()=>{
+  running=false;paused=false;waiting=false;if(raf)cancelAnimationFrame(raf);game.innerHTML="";
+  score=combo=best=correct=attempts=misses=0;resetQuestionDeck();lastDisplay="";updateStats();
+  document.getElementById("answerJP").textContent="—";
+  document.getElementById("answerKR").textContent="발음: —";
+  document.getElementById("meaning").textContent="뜻: —";
+  document.getElementById("result").textContent="";
+};
+document.getElementById("submit").onclick=submit;
+input.addEventListener("keydown",e=>{if(e.key==="Enter")submit();});
+document.addEventListener("keydown",e=>{if(e.code==="Space"&&document.activeElement!==input){e.preventDefault();document.getElementById("pause").click();}});
+document.getElementById("mode").onchange=()=>{updateTopic();resetQuestionDeck();};
+updateTopic();
+
+// iOS Chrome/Safari: 주소창/키보드 변화에 맞춘 실제 보이는 영역 보정
+(function(){
+  function updateViewportVars(){
+    const vv = window.visualViewport;
+    if(!vv) return;
+
+    document.documentElement.style.setProperty("--vvh", vv.height + "px");
+
+    const keyboardHeight = Math.max(
+      0,
+      window.innerHeight - vv.height - vv.offsetTop
+    );
+
+    document.documentElement.style.setProperty(
+      "--kb-offset",
+      keyboardHeight > 80 ? keyboardHeight + "px" : "0px"
+    );
+
+    document.body.classList.toggle("keyboard-open", keyboardHeight > 120);
+  }
+
+  if(window.visualViewport){
+    window.visualViewport.addEventListener("resize", updateViewportVars);
+    window.visualViewport.addEventListener("scroll", updateViewportVars);
+  }
+  window.addEventListener("orientationchange", ()=>{
+    setTimeout(updateViewportVars, 250);
+  });
+  window.addEventListener("resize", updateViewportVars);
+  updateViewportVars();
+})();
+
+// 입력창 탭 시 화면이 과도하게 스크롤되는 것을 최소화
+input.addEventListener("focus", ()=>{
+  setTimeout(()=>{
+    window.scrollTo({top:0, behavior:"instant"});
+  }, 80);
+});
+
+
+// PWA / iPhone 홈 화면 실행
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  });
+}
+
+(function(){
+  const standalone =
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true;
+
+  const hint = document.getElementById("pwaInstallHint");
+  const close = document.getElementById("closePwaHint");
+  const dismissed = localStorage.getItem("jpGamePwaHintDismissed") === "1";
+
+  if (!standalone && !dismissed && hint) {
+    setTimeout(() => { hint.style.display = "block"; }, 1000);
+  }
+
+  if (close) {
+    close.addEventListener("click", () => {
+      hint.style.display = "none";
+      localStorage.setItem("jpGamePwaHintDismissed", "1");
+    });
+  }
+})();
+
+
+// 간단한 학습 기록 저장
+window.addEventListener("beforeunload", () => {
+  try {
+    localStorage.setItem("jpBrickGameStats", JSON.stringify({
+      score, best, correct, attempts, misses
+    }));
+  } catch(e) {}
+});
+
+try {
+  const saved = JSON.parse(localStorage.getItem("jpBrickGameStats") || "null");
+  if (saved) {
+    score = Number(saved.score || 0);
+    best = Number(saved.best || 0);
+    correct = Number(saved.correct || 0);
+    attempts = Number(saved.attempts || 0);
+    misses = Number(saved.misses || 0);
+    updateStats();
+  }
+} catch(e) {}
+
+</script>
+</body>
+</html>
