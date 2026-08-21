@@ -1,4 +1,4 @@
-const CACHE_NAME="jp-brick-game-v5";
+const CACHE_NAME="jp-brick-game-v6";
 const ASSETS=[
   "./",
   "./index.html",
