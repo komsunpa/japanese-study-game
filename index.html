@@ -2,417 +2,316 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>일본어 벽돌게임</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="일본어 벽돌게임">
 <meta name="theme-color" content="#f3f4f6">
 <style>
-  body{font-family:"Malgun Gothic","Yu Gothic UI",sans-serif;margin:0;background:#f3f4f6;color:#111}
-  .wrap{max-width:1100px;margin:0 auto;padding:18px}
-  h1{margin:0 0 6px;font-size:28px}
-  .sub{color:#555;margin-bottom:14px}
-  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
-  select,button,input{font:inherit}
-  select,button{padding:8px 10px}
-  button{cursor:pointer}
-  .main{display:grid;grid-template-columns:1fr 300px;gap:16px}
-  #game{position:relative;height:540px;background:white;border:2px solid #333;overflow:hidden;border-radius:8px}
-  .brick{position:absolute;left:50%;transform:translateX(-50%);padding:16px 26px;border:2px solid #333;background:#fafafa;border-radius:10px;font-size:34px;font-weight:700;white-space:nowrap}
-  .panel{background:white;border:1px solid #ccc;border-radius:8px;padding:14px;margin-bottom:12px}
-  .score{font-size:26px;font-weight:700}
-  .answer-jp{font-size:26px;font-weight:700;margin-bottom:8px}
-  .result{font-size:20px;font-weight:700;margin-top:10px}
-  .bottom{display:flex;gap:10px;margin-top:14px}
-  .bottom input{flex:1;padding:12px;font-size:24px;text-align:center}
-  .bottom button{width:130px;font-weight:700}
-  .ok{color:#087f23}.bad{color:#c92a2a}
-  .small{font-size:14px;line-height:1.55;color:#444}
-  @media(max-width:850px){.main{grid-template-columns:1fr}#game{height:430px}}
+:root{
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-right:env(safe-area-inset-right,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --safe-left:env(safe-area-inset-left,0px);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:"Apple SD Gothic Neo","Malgun Gothic","Yu Gothic UI",sans-serif;background:#eef0f3;color:#111;-webkit-text-size-adjust:100%;overscroll-behavior:none}
+.wrap{max-width:1080px;margin:auto;padding:14px}
+h1{font-size:25px;margin:0 0 3px;text-align:center}
+.sub{text-align:center;font-size:12px;color:#666;margin-bottom:10px}
+.toolbar{display:flex;gap:8px;align-items:end;flex-wrap:wrap;margin-bottom:8px}
+.toolbar label{display:flex;flex-direction:column;gap:3px;font-size:11px;color:#555}
+select,button,input{font:inherit}
+select,button{min-height:42px;border:1px solid #aaa;border-radius:9px;background:#fff;padding:6px 9px}
+button{cursor:pointer;font-weight:600}
+#topic{margin-left:auto;font-size:12px}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:12px}
+#game{position:relative;height:520px;background:#fff;border:1px solid #444;border-radius:12px;overflow:hidden}
+.brick{position:absolute;left:50%;transform:translateX(-50%);max-width:90%;min-width:110px;padding:12px 18px;border:2px solid #333;background:#fafafa;border-radius:11px;text-align:center;font-weight:700;font-size:28px;line-height:1.25;white-space:normal;word-break:keep-all;box-shadow:0 3px 8px rgba(0,0,0,.08)}
+.retryBadge{display:block;font-size:11px;font-weight:600;margin-top:5px;color:#9c4a00}
+.panel{background:#fff;border:1px solid #ccc;border-radius:10px;padding:11px;margin-bottom:9px}
+.score{font-size:22px;font-weight:700}
+.answer-jp{font-size:22px;font-weight:700;line-height:1.3;margin-bottom:4px;word-break:keep-all}
+.result{font-weight:700;margin-top:6px}
+.ok{color:#087f23}.bad{color:#c92a2a}
+.small{font-size:12px;line-height:1.45;color:#555}
+.progress{font-size:11px;line-height:1.45;margin-top:5px}
+.bottom{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:8px;margin-top:10px}
+.bottom input{min-width:0;height:50px;padding:8px;border:2px solid #555;border-radius:12px;text-align:center;font-size:19px}
+.bottom button{height:50px}
+.version{font-size:10px;color:#888;text-align:center;margin-top:4px}
 
-  /* ===== iPhone 15 Pro / iOS Chrome 최적화 ===== */
-  :root{
-    --vvh: 100dvh;
-    --kb-offset: 0px;
-    --safe-top: env(safe-area-inset-top, 0px);
-    --safe-right: env(safe-area-inset-right, 0px);
-    --safe-bottom: env(safe-area-inset-bottom, 0px);
-    --safe-left: env(safe-area-inset-left, 0px);
+@media(max-width:700px){
+  .wrap{
+    width:100%;max-width:none;
+    padding:calc(5px + var(--safe-top)) calc(8px + var(--safe-right)) calc(78px + var(--safe-bottom)) calc(8px + var(--safe-left))
+  }
+  h1{font-size:20px}
+  .sub{font-size:10.5px;margin-bottom:5px}
+  .toolbar{display:grid;grid-template-columns:1.35fr .85fr 1fr 1fr;gap:5px;margin-bottom:6px}
+  .toolbar label{min-width:0}
+  .toolbar select{width:100%;min-width:0;height:38px;min-height:38px;font-size:12px;padding:4px 5px}
+  .toolbar button{width:100%;height:38px;min-height:38px;font-size:12px;padding:4px}
+  #reset{display:none}
+  #topic{grid-column:1/-1;margin:0;text-align:center;font-size:11px}
+  .main{display:flex;flex-direction:column;gap:6px}
+  #game{height:clamp(345px,47dvh,420px);min-height:345px;order:1}
+  .brick{font-size:clamp(20px,6vw,28px);padding:10px 13px;max-width:92%}
+  .main>div:last-child{order:2;display:grid;grid-template-columns:.9fr 1.1fr;gap:6px}
+  .panel{padding:7px 8px;margin:0}
+  .panel:nth-child(3){display:none}
+  .score{font-size:17px}
+  #stats,#combo,#miss,#cycleInfo{font-size:10.5px;line-height:1.35}
+  .answer-jp{font-size:17px}
+  #answerKR,#meaning{font-size:10.5px;line-height:1.35}
+  .result{font-size:13px;margin-top:3px}
+  .bottom{
+    position:fixed;z-index:9999;left:0;right:0;bottom:0;margin:0;
+    padding:7px calc(8px + var(--safe-right)) calc(7px + var(--safe-bottom)) calc(8px + var(--safe-left));
+    grid-template-columns:minmax(0,1fr) 92px;background:rgba(255,255,255,.98);
+    border-top:1px solid #bbb;box-shadow:0 -3px 12px rgba(0,0,0,.1)
+  }
+  .bottom input{height:48px;font-size:18px}
+  .bottom button{height:48px;min-height:48px;font-size:14px;padding:4px}
+  .version{display:none}
+}
+@media(width:393px) and (min-height:800px) and (max-height:900px){
+  #game{height:405px}
+}
+
+/* ===== v5: iPhone 15 Pro용 화면 한글자판 / 고정 레이아웃 ===== */
+.mobileInputArea{
+  margin-top:10px;
+}
+.answerRow{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 120px;
+  gap:8px;
+}
+.answerRow input{
+  min-width:0;
+  height:50px;
+  padding:8px 10px;
+  border:2px solid #555;
+  border-radius:12px;
+  text-align:center;
+  font-size:19px;
+  background:#fff;
+}
+.answerRow button{
+  height:50px;
+  border-radius:12px;
+}
+.hangulKeyboard{
+  display:none;
+}
+
+@media(max-width:700px){
+  html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+  }
+  body{
+    position:fixed;
+    inset:0;
+  }
+  .wrap{
+    height:100dvh;
+    max-height:100dvh;
+    overflow:hidden;
+    display:grid;
+    grid-template-rows:auto auto minmax(0,1fr) auto;
+    padding:
+      calc(4px + var(--safe-top))
+      calc(6px + var(--safe-right))
+      calc(4px + var(--safe-bottom))
+      calc(6px + var(--safe-left));
+  }
+  h1{font-size:17px;margin:0;line-height:1.1}
+  .sub{display:none}
+
+  .toolbar{
+    display:grid;
+    grid-template-columns:1.25fr .75fr .75fr .75fr;
+    gap:4px;
+    margin:3px 0 4px;
+  }
+  .toolbar label{font-size:9px;gap:1px}
+  .toolbar select,
+  .toolbar button{
+    height:32px;
+    min-height:32px;
+    padding:2px 4px;
+    font-size:10.5px;
+    border-radius:7px;
+  }
+  #reset{display:none}
+  #topic{
+    grid-column:1/-1;
+    font-size:9.5px;
+    line-height:1.1;
   }
 
-  html,body{
-    margin:0;
+  .main{
+    min-height:0;
+    display:grid;
+    grid-template-rows:minmax(0,1fr) auto;
+    gap:4px;
+  }
+
+  #game{
+    min-height:0;
+    height:auto;
+    max-height:none;
     width:100%;
-    min-height:100%;
-    overscroll-behavior:none;
-    -webkit-text-size-adjust:100%;
+    border-radius:10px;
+  }
+
+  .brick{
+    font-size:clamp(18px,5.8vw,25px);
+    max-width:94%;
+    padding:8px 11px;
+  }
+
+  .main>div:last-child{
+    display:grid;
+    grid-template-columns:.95fr 1.05fr;
+    gap:4px;
+  }
+  .panel{
+    padding:5px 6px;
+    border-radius:8px;
+  }
+  .panel:nth-child(3){display:none}
+  .score{font-size:15px;line-height:1.05}
+  #stats,#combo,#miss,#cycleInfo{
+    font-size:9px;
+    line-height:1.2;
+  }
+  .answer-jp{font-size:15px;line-height:1.1;margin-bottom:2px}
+  #answerKR,#meaning{font-size:9px;line-height:1.2}
+  .result{font-size:11px;line-height:1.1;margin-top:2px}
+
+  .mobileInputArea{
+    margin-top:4px;
+    flex:none;
+  }
+  .answerRow{
+    grid-template-columns:minmax(0,1fr) 76px;
+    gap:4px;
+  }
+  .answerRow input{
+    height:36px;
+    font-size:16px;
+    padding:4px 6px;
+    border-radius:8px;
+  }
+  .answerRow button{
+    height:36px;
+    min-height:36px;
+    font-size:11px;
+    padding:2px;
+    border-radius:8px;
+  }
+
+  .hangulKeyboard{
+    display:block;
+    margin-top:4px;
+    padding:4px;
+    background:#d8d9dd;
+    border-radius:10px;
+    user-select:none;
+    -webkit-user-select:none;
     touch-action:manipulation;
   }
-
-  body{
+  .keyRow{
+    display:grid;
+    grid-template-columns:repeat(10,1fr);
+    gap:3px;
+    margin-bottom:3px;
+  }
+  .keyRow.row2{
+    grid-template-columns:repeat(9,1fr);
+    padding:0 3%;
+  }
+  .keyRow.row3{
+    grid-template-columns:repeat(8,1fr);
+    padding:0 7%;
+  }
+  .keyRow.row4{
+    grid-template-columns:1fr 1fr 1.35fr;
+    gap:4px;
+    margin-bottom:0;
+  }
+  .hkey{
+    min-width:0;
+    height:34px;
+    min-height:34px;
     padding:0;
-    background:#eef0f3;
+    border:0;
+    border-radius:6px;
+    background:#fff;
+    box-shadow:0 1px 1px rgba(0,0,0,.18);
+    font-size:15px;
+    font-weight:500;
+    color:#111;
+    touch-action:manipulation;
   }
-
-  button,select,input{
-    font-family:"Malgun Gothic","Apple SD Gothic Neo","Yu Gothic UI",sans-serif;
+  .hkey:active{
+    background:#cfd0d4;
+    transform:translateY(1px);
   }
-
-  @media (max-width: 430px){
-    .wrap{
-      width:100%;
-      max-width:none;
-      box-sizing:border-box;
-      padding:
-        calc(6px + var(--safe-top))
-        calc(8px + var(--safe-right))
-        calc(82px + var(--safe-bottom))
-        calc(8px + var(--safe-left));
-    }
-
-    h1{
-      margin:0;
-      font-size:20px;
-      line-height:1.2;
-      text-align:center;
-    }
-
-    .sub{
-      margin:2px 0 6px;
-      font-size:11px;
-      line-height:1.3;
-      text-align:center;
-      color:#666;
-    }
-
-    .toolbar{
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr;
-      gap:5px;
-      margin:0 0 6px;
-      align-items:end;
-    }
-
-    .toolbar label{
-      grid-column:span 1;
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-      min-width:0;
-      font-size:10px;
-      color:#555;
-    }
-
-    .toolbar label:first-child{
-      grid-column:1 / 3;
-    }
-
-    .toolbar label:nth-child(2){
-      grid-column:3;
-    }
-
-    .toolbar select{
-      width:100%;
-      min-width:0;
-      height:38px;
-      padding:5px 7px;
-      border:1px solid #aaa;
-      border-radius:9px;
-      background:#fff;
-      font-size:13px;
-    }
-
-    .toolbar button{
-      min-height:40px;
-      padding:5px 4px;
-      border-radius:9px;
-      font-size:13px;
-      white-space:nowrap;
-    }
-
-    #topic{
-      grid-column:1 / -1;
-      text-align:center;
-      font-size:12px;
-      line-height:1.2;
-      padding:0 0 1px;
-    }
-
-    .main{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-    }
-
-    #game{
-      order:1;
-      width:100%;
-      height:clamp(330px, 49dvh, 425px);
-      min-height:330px;
-      max-height:425px;
-      box-sizing:border-box;
-      border-width:1px;
-      border-radius:12px;
-      background:#fff;
-    }
-
-    .brick{
-      max-width:90%;
-      box-sizing:border-box;
-      padding:11px 17px;
-      border-radius:10px;
-      font-size:clamp(25px, 8vw, 34px);
-      line-height:1.15;
-      text-align:center;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-
-    .main > div:last-child{
-      order:2;
-      display:grid;
-      grid-template-columns:0.9fr 1.1fr;
-      gap:6px;
-      width:100%;
-    }
-
-    .panel{
-      margin:0;
-      padding:8px 9px;
-      border-radius:10px;
-    }
-
-    .panel:nth-child(1){ grid-column:1; }
-    .panel:nth-child(2){ grid-column:2; }
-    .panel:nth-child(3){ display:none; }
-
-    .score{
-      font-size:18px;
-      line-height:1.15;
-      margin-bottom:3px;
-    }
-
-    #stats,#combo,#miss,#cycle{
-      font-size:11px;
-      line-height:1.35;
-    }
-
-    .answer-jp{
-      font-size:19px;
-      line-height:1.15;
-      margin-bottom:3px;
-    }
-
-    #answerKR,#meaning{
-      font-size:11px;
-      line-height:1.35;
-    }
-
-    .result{
-      margin-top:4px;
-      font-size:14px;
-      line-height:1.2;
-    }
-
-    .bottom{
-      position:fixed;
-      z-index:9999;
-      left:0;
-      right:0;
-      bottom:var(--kb-offset);
-      margin:0;
-      padding:
-        7px
-        calc(8px + var(--safe-right))
-        calc(7px + var(--safe-bottom))
-        calc(8px + var(--safe-left));
-      display:grid;
-      grid-template-columns:minmax(0,1fr) 94px;
-      gap:7px;
-      background:rgba(255,255,255,.97);
-      border-top:1px solid #bbb;
-      box-shadow:0 -3px 12px rgba(0,0,0,.10);
-      box-sizing:border-box;
-    }
-
-    .bottom > label{
-      display:none;
-    }
-
-    .bottom input{
-      width:100%;
-      min-width:0;
-      height:48px;
-      box-sizing:border-box;
-      padding:9px 10px;
-      border:2px solid #555;
-      border-radius:12px;
-      font-size:18px; /* iOS 자동 확대 방지 */
-      text-align:center;
-    }
-
-    .bottom button{
-      width:94px;
-      min-height:48px;
-      border-radius:12px;
-      padding:5px;
-      font-size:14px;
-      font-weight:700;
-    }
-
-    body.keyboard-open .wrap{
-      padding-bottom:calc(74px + var(--safe-bottom));
-    }
-
-    body.keyboard-open h1,
-    body.keyboard-open .sub{
-      display:none;
-    }
-
-    body.keyboard-open .toolbar{
-      grid-template-columns:1fr 1fr 1fr;
-      margin-bottom:4px;
-    }
-
-    body.keyboard-open .toolbar label{
-      display:none;
-    }
-
-    body.keyboard-open #topic{
-      display:none;
-    }
-
-    body.keyboard-open #game{
-      height:clamp(220px, 36dvh, 300px);
-      min-height:220px;
-      max-height:300px;
-    }
-
-    body.keyboard-open .main > div:last-child{
-      grid-template-columns:1fr 1fr;
-    }
-
-    body.keyboard-open .panel{
-      padding:6px 8px;
-    }
-
-    body.keyboard-open .score{font-size:16px;}
-    body.keyboard-open #stats,
-    body.keyboard-open #combo,
-    body.keyboard-open #miss,
-    body.keyboard-open #cycle,
-    body.keyboard-open #answerKR,
-    body.keyboard-open #meaning{font-size:10px;}
-    body.keyboard-open .answer-jp{font-size:17px;}
-    body.keyboard-open .result{font-size:12px;}
-
-    @media (max-height: 740px){
-      #game{
-        height:42dvh;
-        min-height:280px;
-      }
-    }
+  .hkey.special{
+    background:#b7bac1;
+    font-size:13px;
   }
-
-  /* iPhone 15 Pro portrait target: 393 x 852 CSS px */
-  @media (width:393px) and (min-height:800px) and (max-height:900px){
-    #game{
-      height:418px;
-    }
-    .wrap{
-      padding-top:calc(5px + var(--safe-top));
-    }
+  .hkey.submitKey{
+    background:#1685e5;
+    color:white;
+    font-weight:700;
+    font-size:12px;
   }
+  .version{display:none}
+}
 
-  @media (max-width: 900px) and (orientation: landscape){
-    .wrap{
-      padding:
-        calc(4px + var(--safe-top))
-        calc(7px + var(--safe-right))
-        calc(76px + var(--safe-bottom))
-        calc(7px + var(--safe-left));
-    }
-
-    h1,.sub{
-      display:none;
-    }
-
-    .toolbar{
-      grid-template-columns:150px 90px repeat(3,1fr);
-      gap:5px;
-      margin-bottom:5px;
-    }
-
-    .toolbar label:first-child,
-    .toolbar label:nth-child(2){
-      grid-column:auto;
-    }
-
-    #topic{
-      display:none;
-    }
-
-    .main{
-      display:grid;
-      grid-template-columns:minmax(0,1fr) 235px;
-      gap:7px;
-    }
-
-    #game{
-      height:calc(var(--vvh) - 132px);
-      min-height:235px;
-      max-height:none;
-    }
-
-    .main > div:last-child{
-      display:block;
-    }
-
-    .panel{
-      margin-bottom:6px;
-    }
-
-    .panel:nth-child(3){
-      display:none;
-    }
+@media(width:393px) and (min-height:800px) and (max-height:900px){
+  .hkey{
+    height:35px;
+    min-height:35px;
   }
+}
 
 </style>
-
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="일본어 벽돌게임">
-
 </head>
 <body>
-
-<div id="pwaInstallHint" style="display:none;position:fixed;z-index:10001;left:10px;right:10px;top:calc(8px + env(safe-area-inset-top));background:#111;color:#fff;border-radius:12px;padding:10px 38px 10px 12px;font-size:12px;line-height:1.45;box-shadow:0 4px 18px rgba(0,0,0,.25);">
-  <b>앱처럼 사용하기</b><br>
-  iPhone에서는 브라우저의 공유 메뉴에서 <b>홈 화면에 추가</b>를 선택하세요. 한 번 추가하면 전체화면으로 실행되고 오프라인에서도 사용할 수 있습니다.
-  <button id="closePwaHint" aria-label="닫기" style="position:absolute;right:8px;top:6px;border:0;background:transparent;color:#fff;font-size:24px;line-height:1;">×</button>
-</div>
-
 <div class="wrap">
   <h1>日本語 벽돌게임</h1>
-  <div class="sub">떠 있는 일본어를 보고 한글 발음을 입력하세요. 맞든 틀리든 정답과 뜻을 보여줍니다.</div>
+  <div class="sub">일본어를 보고 한글 발음을 입력하세요 · 틀린 문제는 같은 사이클에서 랜덤으로 2번 다시 나옵니다.</div>
 
   <div class="toolbar">
-    <label>모드
+    <label>학습 모드
       <select id="mode">
-        <option>오늘의 학습</option>
-        <option>히라가나</option>
-        <option>가타카나</option>
-        <option>여행 단어</option>
-        <option>전체 혼합</option>
+        <option value="sentences" selected>오늘의 학습 · 문장 100</option>
+        <option value="travel">여행 단어 · 100</option>
+        <option value="hiragana">히라가나</option>
+        <option value="katakana">가타카나</option>
+        <option value="all">전체 혼합</option>
       </select>
     </label>
-    <label>낙하 시간 <select id="difficulty"><option selected>15초</option></select></label>
+
+    <label>낙하 시간
+      <select id="duration">
+        <option value="10000">10초</option>
+        <option value="15000" selected>15초</option>
+        <option value="20000">20초</option>
+      </select>
+    </label>
+
     <button id="start">▶ 시작</button>
     <button id="pause">Ⅱ 일시정지</button>
     <button id="reset">↻ 초기화</button>
@@ -426,165 +325,97 @@
         <div class="score" id="score">점수 0</div>
         <div id="stats">정답 0 / 시도 0</div>
         <div id="combo">콤보 0 · 최고 0</div>
-        <div id="miss">바닥 놓침 0</div>
-        <div id="cycle">현재 사이클 남은 문제 —</div>
+        <div id="miss">시간 초과 0</div>
+        <div class="progress" id="cycleInfo">기본 문제 남음 — · 오답 복습 남음 —</div>
       </div>
+
       <div class="panel">
         <div class="answer-jp" id="answerJP">—</div>
         <div id="answerKR">발음: —</div>
         <div id="meaning">뜻: —</div>
         <div class="result" id="result"></div>
       </div>
+
       <div class="panel small">
-        <b>학습 팁</b><br>
-        • 틀려도 정답을 바로 보여줍니다.<br>
-        • 바닥에 닿아도 정답을 보여줍니다.<br>
-        • Enter = 제출, Space = 일시정지<br>
-        • 오늘의 학습은 날짜별로 주제가 바뀝니다.<br>        • 일본어가 화면 위에서 바닥까지 내려오는 시간은 15초입니다.<br>        • 한 사이클이 끝날 때까지 같은 문제는 다시 나오지 않습니다.<br>        • 모든 문제가 한 번씩 나온 뒤에만 다시 섞어서 출제합니다.
+        • 기본 문제는 한 사이클에 한 번씩만 출제됩니다.<br>
+        • 전체를 한 번씩 모두 본 뒤 새 사이클을 다시 섞습니다.<br>
+        • 틀린 기본 문제는 이후 위치에 랜덤으로 정확히 2번 복습 출제합니다.<br>
+        • 오답 복습에서 또 틀려도 복습 횟수는 추가되지 않습니다.
       </div>
     </div>
   </div>
 
-  <div class="bottom">
-    <input id="input" placeholder="한글 발음 입력" autocomplete="off">
-    <button id="submit">제출 Enter</button>
+  <div class="mobileInputArea">
+    <div class="answerRow">
+      <input id="input" placeholder="한글 발음 입력" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="none" readonly>
+      <button id="submit">제출</button>
+    </div>
+
+    <div id="hangulKeyboard" class="hangulKeyboard" aria-label="화면 한글 자판">
+      <div class="keyRow">
+        <button class="hkey" data-key="ㅂ">ㅂ</button>
+        <button class="hkey" data-key="ㅈ">ㅈ</button>
+        <button class="hkey" data-key="ㄷ">ㄷ</button>
+        <button class="hkey" data-key="ㄱ">ㄱ</button>
+        <button class="hkey" data-key="ㅅ">ㅅ</button>
+        <button class="hkey" data-key="ㅛ">ㅛ</button>
+        <button class="hkey" data-key="ㅕ">ㅕ</button>
+        <button class="hkey" data-key="ㅑ">ㅑ</button>
+        <button class="hkey" data-key="ㅐ">ㅐ</button>
+        <button class="hkey" data-key="ㅔ">ㅔ</button>
+      </div>
+      <div class="keyRow row2">
+        <button class="hkey" data-key="ㅁ">ㅁ</button>
+        <button class="hkey" data-key="ㄴ">ㄴ</button>
+        <button class="hkey" data-key="ㅇ">ㅇ</button>
+        <button class="hkey" data-key="ㄹ">ㄹ</button>
+        <button class="hkey" data-key="ㅎ">ㅎ</button>
+        <button class="hkey" data-key="ㅗ">ㅗ</button>
+        <button class="hkey" data-key="ㅓ">ㅓ</button>
+        <button class="hkey" data-key="ㅏ">ㅏ</button>
+        <button class="hkey" data-key="ㅣ">ㅣ</button>
+      </div>
+      <div class="keyRow row3">
+        <button class="hkey" data-key="ㅋ">ㅋ</button>
+        <button class="hkey" data-key="ㅌ">ㅌ</button>
+        <button class="hkey" data-key="ㅊ">ㅊ</button>
+        <button class="hkey" data-key="ㅍ">ㅍ</button>
+        <button class="hkey" data-key="ㅠ">ㅠ</button>
+        <button class="hkey" data-key="ㅜ">ㅜ</button>
+        <button class="hkey" data-key="ㅡ">ㅡ</button>
+        <button class="hkey special" data-action="backspace">⌫</button>
+      </div>
+      <div class="keyRow row4">
+        <button class="hkey special wide" data-action="clear">지우기</button>
+        <button class="hkey special wide" data-action="space">띄어쓰기</button>
+        <button class="hkey submitKey" data-action="submit">정답 제출</button>
+      </div>
+    </div>
   </div>
+  <div class="version">v5 · iPhone 화면자판 · 100문장 / 여행단어100 / 10·15·20초 / 오답 2회 복습</div>
 </div>
 
 <script>
-const hira = [
-["あ","아"],["い","이"],["う","우"],["え","에"],["お","오"],
-["か","카"],["き","키"],["く","쿠"],["け","케"],["こ","코"],
-["さ","사"],["し","시"],["す","스"],["せ","세"],["そ","소"],
-["た","타"],["ち","치"],["つ","츠"],["て","테"],["と","토"],
-["な","나"],["に","니"],["ぬ","누"],["ね","네"],["の","노"],
-["は","하"],["ひ","히"],["ふ","후"],["へ","헤"],["ほ","호"],
-["ま","마"],["み","미"],["む","무"],["め","메"],["も","모"],
-["や","야"],["ゆ","유"],["よ","요"],
-["ら","라"],["り","리"],["る","루"],["れ","레"],["ろ","로"],
-["わ","와"],["を","오"],["ん","응"],
-["が","가"],["ぎ","기"],["ぐ","구"],["げ","게"],["ご","고"],
-["ざ","자"],["じ","지"],["ず","즈"],["ぜ","제"],["ぞ","조"],
-["だ","다"],["ぢ","지"],["づ","즈"],["で","데"],["ど","도"],
-["ば","바"],["び","비"],["ぶ","부"],["べ","베"],["ぼ","보"],
-["ぱ","파"],["ぴ","피"],["ぷ","푸"],["ぺ","페"],["ぽ","포"]
-].map(x=>({display:x[0],answers:[x[1]],meaning:`히라가나 ${x[0]}`,category:"히라가나"}));
+const DATA = {"sentences": [{"id": "S001", "display": "おはようございます", "answers": ["오하요고자이마스", "오하요우고자이마스"], "meaning": "좋은 아침입니다", "category": "오늘의 학습"}, {"id": "S002", "display": "こんにちは", "answers": ["곤니치와", "콘니치와"], "meaning": "안녕하세요", "category": "오늘의 학습"}, {"id": "S003", "display": "こんばんは", "answers": ["곤방와", "콘방와"], "meaning": "안녕하세요 / 좋은 저녁입니다", "category": "오늘의 학습"}, {"id": "S004", "display": "はじめまして", "answers": ["하지메마시테"], "meaning": "처음 뵙겠습니다", "category": "오늘의 학습"}, {"id": "S005", "display": "よろしくおねがいします", "answers": ["요로시쿠오네가이시마스"], "meaning": "잘 부탁드립니다", "category": "오늘의 학습"}, {"id": "S006", "display": "ありがとうございます", "answers": ["아리가토고자이마스", "아리가토우고자이마스"], "meaning": "감사합니다", "category": "오늘의 학습"}, {"id": "S007", "display": "どういたしまして", "answers": ["도이타시마시테", "도우이타시마시테"], "meaning": "천만에요", "category": "오늘의 학습"}, {"id": "S008", "display": "すみません", "answers": ["스미마센"], "meaning": "실례합니다 / 죄송합니다 / 저기요", "category": "오늘의 학습"}, {"id": "S009", "display": "だいじょうぶです", "answers": ["다이죠부데스", "다이조부데스"], "meaning": "괜찮습니다", "category": "오늘의 학습"}, {"id": "S010", "display": "わかりました", "answers": ["와카리마시타"], "meaning": "알겠습니다", "category": "오늘의 학습"}, {"id": "S011", "display": "わかりません", "answers": ["와카리마센"], "meaning": "모르겠습니다", "category": "오늘의 학습"}, {"id": "S012", "display": "もういちどおねがいします", "answers": ["모이치도오네가이시마스", "모우이치도오네가이시마스"], "meaning": "한 번 더 부탁합니다", "category": "오늘의 학습"}, {"id": "S013", "display": "ゆっくりはなしてください", "answers": ["윳쿠리하나시테쿠다사이", "육쿠리하나시테쿠다사이"], "meaning": "천천히 말해 주세요", "category": "오늘의 학습"}, {"id": "S014", "display": "にほんごはすこしだけできます", "answers": ["니혼고와스코시다케데키마스"], "meaning": "일본어는 조금 할 수 있습니다", "category": "오늘의 학습"}, {"id": "S015", "display": "えいごははなせますか", "answers": ["에이고와하나세마스카"], "meaning": "영어를 할 수 있습니까?", "category": "오늘의 학습"}, {"id": "S016", "display": "おなまえはなんですか", "answers": ["오나마에와난데스카"], "meaning": "이름이 무엇입니까?", "category": "오늘의 학습"}, {"id": "S017", "display": "わたしはかんこくじんです", "answers": ["와타시와칸코쿠진데스"], "meaning": "저는 한국인입니다", "category": "오늘의 학습"}, {"id": "S018", "display": "きょうはいいてんきですね", "answers": ["쿄와이이텐키데스네", "쿄우와이이텐키데스네"], "meaning": "오늘은 날씨가 좋네요", "category": "오늘의 학습"}, {"id": "S019", "display": "つかれました", "answers": ["츠카레마시타"], "meaning": "피곤합니다", "category": "오늘의 학습"}, {"id": "S020", "display": "たのしかったです", "answers": ["타노시캇타데스"], "meaning": "즐거웠습니다", "category": "오늘의 학습"}, {"id": "S021", "display": "いまなんじですか", "answers": ["이마난지데스카"], "meaning": "지금 몇 시입니까?", "category": "오늘의 학습"}, {"id": "S022", "display": "いまはくじです", "answers": ["이마와쿠지데스"], "meaning": "지금은 9시입니다", "category": "오늘의 학습"}, {"id": "S023", "display": "あしたはげつようびです", "answers": ["아시타와게츠요비데스", "아시타와게츠요우비데스"], "meaning": "내일은 월요일입니다", "category": "오늘의 학습"}, {"id": "S024", "display": "きょうはなんようびですか", "answers": ["쿄와난요비데스카", "쿄우와난요우비데스카"], "meaning": "오늘은 무슨 요일입니까?", "category": "오늘의 학습"}, {"id": "S025", "display": "なんじにあいますか", "answers": ["난지니아이마스카"], "meaning": "몇 시에 만납니까?", "category": "오늘의 학습"}, {"id": "S026", "display": "ごぜんじゅうじでいいですか", "answers": ["고젠쥬지데이이데스카", "고젠주지데이이데스카"], "meaning": "오전 10시면 괜찮습니까?", "category": "오늘의 학습"}, {"id": "S027", "display": "ごごさんじにしゅっぱつします", "answers": ["고고산지니슛파츠시마스", "고고산지니숫파츠시마스"], "meaning": "오후 3시에 출발합니다", "category": "오늘의 학습"}, {"id": "S028", "display": "じかんはどのくらいかかりますか", "answers": ["지칸와도노쿠라이카카리마스카"], "meaning": "시간은 얼마나 걸립니까?", "category": "오늘의 학습"}, {"id": "S029", "display": "あとじゅっぷんです", "answers": ["아토쥿푼데스", "아토줏푼데스"], "meaning": "앞으로 10분입니다", "category": "오늘의 학습"}, {"id": "S030", "display": "いちじかんぐらいです", "answers": ["이치지칸구라이데스"], "meaning": "약 1시간입니다", "category": "오늘의 학습"}, {"id": "S031", "display": "きょうははちがつにじゅういちにちです", "answers": ["쿄와하치가츠니쥬이치니치데스", "쿄우와하치가츠니주우이치니치데스"], "meaning": "오늘은 8월 21일입니다", "category": "오늘의 학습"}, {"id": "S032", "display": "よやくはしちじです", "answers": ["요야쿠와시치지데스"], "meaning": "예약은 7시입니다", "category": "오늘의 학습"}, {"id": "S033", "display": "みっかかんたいざいします", "answers": ["믹카칸타이자이시마스"], "meaning": "3일간 체류합니다", "category": "오늘의 학습"}, {"id": "S034", "display": "ふたりです", "answers": ["후타리데스"], "meaning": "두 명입니다", "category": "오늘의 학습"}, {"id": "S035", "display": "ひとつください", "answers": ["히토츠쿠다사이"], "meaning": "하나 주세요", "category": "오늘의 학습"}, {"id": "S036", "display": "えきはどこですか", "answers": ["에키와도코데스카"], "meaning": "역은 어디입니까?", "category": "오늘의 학습"}, {"id": "S037", "display": "くうこうまでおねがいします", "answers": ["쿠코마데오네가이시마스", "쿠우코우마데오네가이시마스"], "meaning": "공항까지 부탁합니다", "category": "오늘의 학습"}, {"id": "S038", "display": "タクシーをよんでください", "answers": ["타쿠시오욘데쿠다사이", "타쿠시이오욘데쿠다사이"], "meaning": "택시를 불러 주세요", "category": "오늘의 학습"}, {"id": "S039", "display": "ここでとめてください", "answers": ["코코데토메테쿠다사이"], "meaning": "여기에서 세워 주세요", "category": "오늘의 학습"}, {"id": "S040", "display": "つぎのみぎをまがってください", "answers": ["츠기노미기오마갓테쿠다사이"], "meaning": "다음 오른쪽으로 돌아 주세요", "category": "오늘의 학습"}, {"id": "S041", "display": "つぎのひだりをまがってください", "answers": ["츠기노히다리오마갓테쿠다사이"], "meaning": "다음 왼쪽으로 돌아 주세요", "category": "오늘의 학습"}, {"id": "S042", "display": "まっすぐいってください", "answers": ["맛스구잇테쿠다사이", "맛수구잇테쿠다사이"], "meaning": "곧장 가 주세요", "category": "오늘의 학습"}, {"id": "S043", "display": "このでんしゃはとうきょうにいきますか", "answers": ["코노덴샤와토쿄니이키마스카", "코노덴샤와토우쿄우니이키마스카"], "meaning": "이 전철은 도쿄에 갑니까?", "category": "오늘의 학습"}, {"id": "S044", "display": "なんばんせんですか", "answers": ["난반센데스카"], "meaning": "몇 번 선입니까?", "category": "오늘의 학습"}, {"id": "S045", "display": "のりばはどこですか", "answers": ["노리바와도코데스카"], "meaning": "승강장은 어디입니까?", "category": "오늘의 학습"}, {"id": "S046", "display": "きっぷはどこでかいますか", "answers": ["킷푸와도코데카이마스카"], "meaning": "표는 어디서 삽니까?", "category": "오늘의 학습"}, {"id": "S047", "display": "しんかんせんにのりたいです", "answers": ["신칸센니노리타이데스"], "meaning": "신칸센을 타고 싶습니다", "category": "오늘의 학습"}, {"id": "S048", "display": "つぎのえきでおります", "answers": ["츠기노에키데오리마스"], "meaning": "다음 역에서 내립니다", "category": "오늘의 학습"}, {"id": "S049", "display": "ここからあるいていけますか", "answers": ["코코카라아루이테이케마스카"], "meaning": "여기서 걸어갈 수 있습니까?", "category": "오늘의 학습"}, {"id": "S050", "display": "ちずをみせてください", "answers": ["치즈오미세테쿠다사이"], "meaning": "지도를 보여 주세요", "category": "오늘의 학습"}, {"id": "S051", "display": "みぎがわにあります", "answers": ["미기가와니아리마스"], "meaning": "오른쪽에 있습니다", "category": "오늘의 학습"}, {"id": "S052", "display": "ひだりがわにあります", "answers": ["히다리가와니아리마스"], "meaning": "왼쪽에 있습니다", "category": "오늘의 학습"}, {"id": "S053", "display": "えきのまえにあります", "answers": ["에키노마에니아리마스"], "meaning": "역 앞에 있습니다", "category": "오늘의 학습"}, {"id": "S054", "display": "ホテルのとなりです", "answers": ["호테루노토나리데스"], "meaning": "호텔 옆입니다", "category": "오늘의 학습"}, {"id": "S055", "display": "ここからとおいですか", "answers": ["코코카라토오이데스카"], "meaning": "여기서 멉니까?", "category": "오늘의 학습"}, {"id": "S056", "display": "メニューをみせてください", "answers": ["메뉴오미세테쿠다사이", "메뉴우오미세테쿠다사이"], "meaning": "메뉴를 보여 주세요", "category": "오늘의 학습"}, {"id": "S057", "display": "これをください", "answers": ["코레오쿠다사이"], "meaning": "이것을 주세요", "category": "오늘의 학습"}, {"id": "S058", "display": "おすすめはなんですか", "answers": ["오스스메와난데스카"], "meaning": "추천 메뉴는 무엇입니까?", "category": "오늘의 학습"}, {"id": "S059", "display": "からくしないでください", "answers": ["카라쿠시나이데쿠다사이"], "meaning": "맵지 않게 해 주세요", "category": "오늘의 학습"}, {"id": "S060", "display": "みずをください", "answers": ["미즈오쿠다사이"], "meaning": "물을 주세요", "category": "오늘의 학습"}, {"id": "S061", "display": "ビールをひとつください", "answers": ["비루오히토츠쿠다사이", "비이루오히토츠쿠다사이"], "meaning": "맥주 한 잔 주세요", "category": "오늘의 학습"}, {"id": "S062", "display": "ごはんをすこしください", "answers": ["고한오스코시쿠다사이"], "meaning": "밥을 조금 주세요", "category": "오늘의 학습"}, {"id": "S063", "display": "にくはたべません", "answers": ["니쿠와타베마센"], "meaning": "고기는 먹지 않습니다", "category": "오늘의 학습"}, {"id": "S064", "display": "さかなはだいじょうぶです", "answers": ["사카나와다이죠부데스", "사카나와다이조부데스"], "meaning": "생선은 괜찮습니다", "category": "오늘의 학습"}, {"id": "S065", "display": "やさいをおおくしてください", "answers": ["야사이오오오쿠시테쿠다사이"], "meaning": "채소를 많이 해 주세요", "category": "오늘의 학습"}, {"id": "S066", "display": "これはなんですか", "answers": ["코레와난데스카"], "meaning": "이것은 무엇입니까?", "category": "오늘의 학습"}, {"id": "S067", "display": "とてもおいしいです", "answers": ["토테모오이시이데스"], "meaning": "아주 맛있습니다", "category": "오늘의 학습"}, {"id": "S068", "display": "おかいけいをおねがいします", "answers": ["오카이케이오오네가이시마스"], "meaning": "계산 부탁합니다", "category": "오늘의 학습"}, {"id": "S069", "display": "カードでしはらえますか", "answers": ["카도데시하라에마스카", "카아도데시하라에마스카"], "meaning": "카드로 결제할 수 있습니까?", "category": "오늘의 학습"}, {"id": "S070", "display": "げんきんだけですか", "answers": ["겐킨다케데스카"], "meaning": "현금만 됩니까?", "category": "오늘의 학습"}, {"id": "S071", "display": "よやくしています", "answers": ["요야쿠시테이마스"], "meaning": "예약했습니다", "category": "오늘의 학습"}, {"id": "S072", "display": "ふたりぶんよやくしています", "answers": ["후타리분요야쿠시테이마스"], "meaning": "두 명분 예약했습니다", "category": "오늘의 학습"}, {"id": "S073", "display": "まどぎわのせきはありますか", "answers": ["마도기와노세키와아리마스카"], "meaning": "창가 자리가 있습니까?", "category": "오늘의 학습"}, {"id": "S074", "display": "きんえんせきでおねがいします", "answers": ["킨엔세키데오네가이시마스"], "meaning": "금연석으로 부탁합니다", "category": "오늘의 학습"}, {"id": "S075", "display": "もういっぱいください", "answers": ["모잇파이쿠다사이", "모우잇파이쿠다사이"], "meaning": "한 잔 더 주세요", "category": "오늘의 학습"}, {"id": "S076", "display": "いくらですか", "answers": ["이쿠라데스카"], "meaning": "얼마입니까?", "category": "오늘의 학습"}, {"id": "S077", "display": "もうすこしやすくなりますか", "answers": ["모스코시야스쿠나리마스카", "모우스코시야스쿠나리마스카"], "meaning": "조금 더 싸게 됩니까?", "category": "오늘의 학습"}, {"id": "S078", "display": "これをみせてください", "answers": ["코레오미세테쿠다사이"], "meaning": "이것을 보여 주세요", "category": "오늘의 학습"}, {"id": "S079", "display": "べつのサイズはありますか", "answers": ["베츠노사이즈와아리마스카"], "meaning": "다른 사이즈가 있습니까?", "category": "오늘의 학습"}, {"id": "S080", "display": "くろいろはありますか", "answers": ["쿠로이로와아리마스카"], "meaning": "검은색이 있습니까?", "category": "오늘의 학습"}, {"id": "S081", "display": "カードはつかえますか", "answers": ["카도와츠카에마스카", "카아도와츠카에마스카"], "meaning": "카드를 사용할 수 있습니까?", "category": "오늘의 학습"}, {"id": "S082", "display": "レシートをください", "answers": ["레시토오쿠다사이", "레시이토오쿠다사이"], "meaning": "영수증을 주세요", "category": "오늘의 학습"}, {"id": "S083", "display": "ホテルをよやくしています", "answers": ["호테루오요야쿠시테이마스"], "meaning": "호텔을 예약했습니다", "category": "오늘의 학습"}, {"id": "S084", "display": "チェックインをおねがいします", "answers": ["쳇쿠인오오네가이시마스", "체쿠인오오네가이시마스"], "meaning": "체크인 부탁합니다", "category": "오늘의 학습"}, {"id": "S085", "display": "チェックアウトはなんじですか", "answers": ["쳇쿠아우토와난지데스카", "체쿠아우토와난지데스카"], "meaning": "체크아웃은 몇 시입니까?", "category": "오늘의 학습"}, {"id": "S086", "display": "ワイファイのパスワードはなんですか", "answers": ["와이파이노파스와도와난데스카", "와이파이노파스워도와난데스카"], "meaning": "와이파이 비밀번호는 무엇입니까?", "category": "오늘의 학습"}, {"id": "S087", "display": "にもつをあずかってください", "answers": ["니모츠오아즈캇테쿠다사이"], "meaning": "짐을 맡아 주세요", "category": "오늘의 학습"}, {"id": "S088", "display": "タオルをもういちまいください", "answers": ["타오루오모이치마이쿠다사이", "타오루오모우이치마이쿠다사이"], "meaning": "수건 한 장 더 주세요", "category": "오늘의 학습"}, {"id": "S089", "display": "へやをかえてもらえますか", "answers": ["헤야오카에테모라에마스카"], "meaning": "방을 바꿔 주실 수 있습니까?", "category": "오늘의 학습"}, {"id": "S090", "display": "エアコンがききません", "answers": ["에아콘가키키마센"], "meaning": "에어컨이 작동하지 않습니다", "category": "오늘의 학습"}, {"id": "S091", "display": "かいぎはなんじからですか", "answers": ["카이기와난지카라데스카"], "meaning": "회의는 몇 시부터입니까?", "category": "오늘의 학습"}, {"id": "S092", "display": "しりょうをみせてください", "answers": ["시료오미세테쿠다사이", "시료우오미세테쿠다사이"], "meaning": "자료를 보여 주세요", "category": "오늘의 학습"}, {"id": "S093", "display": "もういちどかくにんします", "answers": ["모이치도카쿠닌시마스", "모우이치도카쿠닌시마스"], "meaning": "한 번 더 확인하겠습니다", "category": "오늘의 학습"}, {"id": "S094", "display": "よていどおりすすんでいます", "answers": ["요테이도오리스슨데이마스"], "meaning": "예정대로 진행되고 있습니다", "category": "오늘의 학습"}, {"id": "S095", "display": "しんちょくをおしえてください", "answers": ["신쵸쿠오오시에테쿠다사이", "신초쿠오오시에테쿠다사이"], "meaning": "진행 상황을 알려 주세요", "category": "오늘의 학습"}, {"id": "S096", "display": "もんだいがあります", "answers": ["몬다이가아리마스"], "meaning": "문제가 있습니다", "category": "오늘의 학습"}, {"id": "S097", "display": "あとでれんらくします", "answers": ["아토데렌라쿠시마스"], "meaning": "나중에 연락하겠습니다", "category": "오늘의 학습"}, {"id": "S098", "display": "メールでおくってください", "answers": ["메루데오쿳테쿠다사이", "메에루데오쿳테쿠다사이"], "meaning": "메일로 보내 주세요", "category": "오늘의 학습"}, {"id": "S099", "display": "きょうちゅうにへんじします", "answers": ["쿄츄니헨지시마스", "쿄우츄우니헨지시마스"], "meaning": "오늘 중으로 답변하겠습니다", "category": "오늘의 학습"}, {"id": "S100", "display": "よろしくごかくにんください", "answers": ["요로시쿠고카쿠닌쿠다사이"], "meaning": "확인 부탁드립니다", "category": "오늘의 학습"}], "travel": [{"id": "T001", "display": "えき", "answers": ["에키"], "meaning": "역", "category": "여행 단어"}, {"id": "T002", "display": "くうこう", "answers": ["쿠코", "쿠우코우"], "meaning": "공항", "category": "여행 단어"}, {"id": "T003", "display": "タクシー", "answers": ["타쿠시", "타쿠시이"], "meaning": "택시", "category": "여행 단어"}, {"id": "T004", "display": "バス", "answers": ["바스"], "meaning": "버스", "category": "여행 단어"}, {"id": "T005", "display": "でんしゃ", "answers": ["덴샤"], "meaning": "전철", "category": "여행 단어"}, {"id": "T006", "display": "ちかてつ", "answers": ["치카테츠"], "meaning": "지하철", "category": "여행 단어"}, {"id": "T007", "display": "しんかんせん", "answers": ["신칸센"], "meaning": "신칸센", "category": "여행 단어"}, {"id": "T008", "display": "きっぷ", "answers": ["킷푸"], "meaning": "표", "category": "여행 단어"}, {"id": "T009", "display": "のりば", "answers": ["노리바"], "meaning": "승강장", "category": "여행 단어"}, {"id": "T010", "display": "かいさつ", "answers": ["카이사츠"], "meaning": "개찰구", "category": "여행 단어"}, {"id": "T011", "display": "でぐち", "answers": ["데구치"], "meaning": "출구", "category": "여행 단어"}, {"id": "T012", "display": "いりぐち", "answers": ["이리구치"], "meaning": "입구", "category": "여행 단어"}, {"id": "T013", "display": "みぎ", "answers": ["미기"], "meaning": "오른쪽", "category": "여행 단어"}, {"id": "T014", "display": "ひだり", "answers": ["히다리"], "meaning": "왼쪽", "category": "여행 단어"}, {"id": "T015", "display": "まっすぐ", "answers": ["맛스구", "맛수구"], "meaning": "직진", "category": "여행 단어"}, {"id": "T016", "display": "まえ", "answers": ["마에"], "meaning": "앞", "category": "여행 단어"}, {"id": "T017", "display": "うしろ", "answers": ["우시로"], "meaning": "뒤", "category": "여행 단어"}, {"id": "T018", "display": "となり", "answers": ["토나리"], "meaning": "옆", "category": "여행 단어"}, {"id": "T019", "display": "ちかい", "answers": ["치카이"], "meaning": "가깝다", "category": "여행 단어"}, {"id": "T020", "display": "とおい", "answers": ["토오이"], "meaning": "멀다", "category": "여행 단어"}, {"id": "T021", "display": "ホテル", "answers": ["호테루"], "meaning": "호텔", "category": "여행 단어"}, {"id": "T022", "display": "フロント", "answers": ["후론토"], "meaning": "프런트", "category": "여행 단어"}, {"id": "T023", "display": "よやく", "answers": ["요야쿠"], "meaning": "예약", "category": "여행 단어"}, {"id": "T024", "display": "へや", "answers": ["헤야"], "meaning": "방", "category": "여행 단어"}, {"id": "T025", "display": "かぎ", "answers": ["카기"], "meaning": "열쇠", "category": "여행 단어"}, {"id": "T026", "display": "エレベーター", "answers": ["에레베타", "에레베에타아"], "meaning": "엘리베이터", "category": "여행 단어"}, {"id": "T027", "display": "トイレ", "answers": ["토이레"], "meaning": "화장실", "category": "여행 단어"}, {"id": "T028", "display": "シャワー", "answers": ["샤와", "샤와아"], "meaning": "샤워", "category": "여행 단어"}, {"id": "T029", "display": "タオル", "answers": ["타오루"], "meaning": "수건", "category": "여행 단어"}, {"id": "T030", "display": "ベッド", "answers": ["벳도"], "meaning": "침대", "category": "여행 단어"}, {"id": "T031", "display": "レストラン", "answers": ["레스토란"], "meaning": "레스토랑", "category": "여행 단어"}, {"id": "T032", "display": "メニュー", "answers": ["메뉴", "메뉴우"], "meaning": "메뉴", "category": "여행 단어"}, {"id": "T033", "display": "みず", "answers": ["미즈"], "meaning": "물", "category": "여행 단어"}, {"id": "T034", "display": "おちゃ", "answers": ["오챠", "오차"], "meaning": "차", "category": "여행 단어"}, {"id": "T035", "display": "コーヒー", "answers": ["코히", "코오히이"], "meaning": "커피", "category": "여행 단어"}, {"id": "T036", "display": "ビール", "answers": ["비루", "비이루"], "meaning": "맥주", "category": "여행 단어"}, {"id": "T037", "display": "ごはん", "answers": ["고한"], "meaning": "밥 / 식사", "category": "여행 단어"}, {"id": "T038", "display": "にく", "answers": ["니쿠"], "meaning": "고기", "category": "여행 단어"}, {"id": "T039", "display": "さかな", "answers": ["사카나"], "meaning": "생선", "category": "여행 단어"}, {"id": "T040", "display": "やさい", "answers": ["야사이"], "meaning": "채소", "category": "여행 단어"}, {"id": "T041", "display": "すし", "answers": ["스시"], "meaning": "초밥", "category": "여행 단어"}, {"id": "T042", "display": "ラーメン", "answers": ["라멘", "라아멘"], "meaning": "라멘", "category": "여행 단어"}, {"id": "T043", "display": "うどん", "answers": ["우동"], "meaning": "우동", "category": "여행 단어"}, {"id": "T044", "display": "そば", "answers": ["소바"], "meaning": "소바", "category": "여행 단어"}, {"id": "T045", "display": "カレー", "answers": ["카레", "카레에"], "meaning": "카레", "category": "여행 단어"}, {"id": "T046", "display": "たまご", "answers": ["타마고"], "meaning": "달걀", "category": "여행 단어"}, {"id": "T047", "display": "ぎゅうにゅう", "answers": ["규뉴", "규우뉴우"], "meaning": "우유", "category": "여행 단어"}, {"id": "T048", "display": "パン", "answers": ["판"], "meaning": "빵", "category": "여행 단어"}, {"id": "T049", "display": "くだもの", "answers": ["쿠다모노"], "meaning": "과일", "category": "여행 단어"}, {"id": "T050", "display": "デザート", "answers": ["데자토", "데자아토"], "meaning": "디저트", "category": "여행 단어"}, {"id": "T051", "display": "はし", "answers": ["하시"], "meaning": "젓가락", "category": "여행 단어"}, {"id": "T052", "display": "スプーン", "answers": ["스푼", "스푸운"], "meaning": "숟가락", "category": "여행 단어"}, {"id": "T053", "display": "フォーク", "answers": ["포쿠", "포오쿠"], "meaning": "포크", "category": "여행 단어"}, {"id": "T054", "display": "ナイフ", "answers": ["나이후"], "meaning": "나이프", "category": "여행 단어"}, {"id": "T055", "display": "さら", "answers": ["사라"], "meaning": "접시", "category": "여행 단어"}, {"id": "T056", "display": "いくら", "answers": ["이쿠라"], "meaning": "얼마", "category": "여행 단어"}, {"id": "T057", "display": "げんきん", "answers": ["겐킨"], "meaning": "현금", "category": "여행 단어"}, {"id": "T058", "display": "カード", "answers": ["카도", "카아도"], "meaning": "카드", "category": "여행 단어"}, {"id": "T059", "display": "レシート", "answers": ["레시토", "레시이토"], "meaning": "영수증", "category": "여행 단어"}, {"id": "T060", "display": "おつり", "answers": ["오츠리"], "meaning": "거스름돈", "category": "여행 단어"}, {"id": "T061", "display": "みせ", "answers": ["미세"], "meaning": "가게", "category": "여행 단어"}, {"id": "T062", "display": "コンビニ", "answers": ["콘비니"], "meaning": "편의점", "category": "여행 단어"}, {"id": "T063", "display": "スーパー", "answers": ["스파", "스우파아"], "meaning": "슈퍼마켓", "category": "여행 단어"}, {"id": "T064", "display": "デパート", "answers": ["데파토", "데파아토"], "meaning": "백화점", "category": "여행 단어"}, {"id": "T065", "display": "くすり", "answers": ["쿠스리"], "meaning": "약", "category": "여행 단어"}, {"id": "T066", "display": "びょういん", "answers": ["뵤인", "뵤우인"], "meaning": "병원", "category": "여행 단어"}, {"id": "T067", "display": "けいさつ", "answers": ["케이사츠"], "meaning": "경찰", "category": "여행 단어"}, {"id": "T068", "display": "こうばん", "answers": ["코반", "코우반"], "meaning": "파출소", "category": "여행 단어"}, {"id": "T069", "display": "ちず", "answers": ["치즈"], "meaning": "지도", "category": "여행 단어"}, {"id": "T070", "display": "じゅうしょ", "answers": ["쥬쇼", "주우쇼"], "meaning": "주소", "category": "여행 단어"}, {"id": "T071", "display": "でんわ", "answers": ["덴와"], "meaning": "전화", "category": "여행 단어"}, {"id": "T072", "display": "けいたい", "answers": ["케이타이"], "meaning": "휴대전화", "category": "여행 단어"}, {"id": "T073", "display": "ワイファイ", "answers": ["와이파이"], "meaning": "와이파이", "category": "여행 단어"}, {"id": "T074", "display": "パスポート", "answers": ["파스포토", "파스포오토"], "meaning": "여권", "category": "여행 단어"}, {"id": "T075", "display": "ビザ", "answers": ["비자"], "meaning": "비자", "category": "여행 단어"}, {"id": "T076", "display": "にもつ", "answers": ["니모츠"], "meaning": "짐", "category": "여행 단어"}, {"id": "T077", "display": "スーツケース", "answers": ["스츠케스", "스우츠케에스"], "meaning": "여행가방", "category": "여행 단어"}, {"id": "T078", "display": "かさ", "answers": ["카사"], "meaning": "우산", "category": "여행 단어"}, {"id": "T079", "display": "くつ", "answers": ["쿠츠"], "meaning": "신발", "category": "여행 단어"}, {"id": "T080", "display": "ふく", "answers": ["후쿠"], "meaning": "옷", "category": "여행 단어"}, {"id": "T081", "display": "みやげ", "answers": ["미야게"], "meaning": "기념품", "category": "여행 단어"}, {"id": "T082", "display": "しゃしん", "answers": ["샤신"], "meaning": "사진", "category": "여행 단어"}, {"id": "T083", "display": "かんこう", "answers": ["칸코", "칸코우"], "meaning": "관광", "category": "여행 단어"}, {"id": "T084", "display": "おてら", "answers": ["오테라"], "meaning": "절", "category": "여행 단어"}, {"id": "T085", "display": "じんじゃ", "answers": ["진자"], "meaning": "신사", "category": "여행 단어"}, {"id": "T086", "display": "こうえん", "answers": ["코엔", "코우엔"], "meaning": "공원", "category": "여행 단어"}, {"id": "T087", "display": "うみ", "answers": ["우미"], "meaning": "바다", "category": "여행 단어"}, {"id": "T088", "display": "やま", "answers": ["야마"], "meaning": "산", "category": "여행 단어"}, {"id": "T089", "display": "おんせん", "answers": ["온센"], "meaning": "온천", "category": "여행 단어"}, {"id": "T090", "display": "てんき", "answers": ["텐키"], "meaning": "날씨", "category": "여행 단어"}, {"id": "T091", "display": "あめ", "answers": ["아메"], "meaning": "비", "category": "여행 단어"}, {"id": "T092", "display": "ゆき", "answers": ["유키"], "meaning": "눈", "category": "여행 단어"}, {"id": "T093", "display": "あつい", "answers": ["아츠이"], "meaning": "덥다", "category": "여행 단어"}, {"id": "T094", "display": "さむい", "answers": ["사무이"], "meaning": "춥다", "category": "여행 단어"}, {"id": "T095", "display": "おいしい", "answers": ["오이시이"], "meaning": "맛있다", "category": "여행 단어"}, {"id": "T096", "display": "たかい", "answers": ["타카이"], "meaning": "비싸다 / 높다", "category": "여행 단어"}, {"id": "T097", "display": "やすい", "answers": ["야스이"], "meaning": "싸다", "category": "여행 단어"}, {"id": "T098", "display": "たのしい", "answers": ["타노시이"], "meaning": "즐겁다", "category": "여행 단어"}, {"id": "T099", "display": "ありがとう", "answers": ["아리가토", "아리가토우"], "meaning": "고마워", "category": "여행 단어"}, {"id": "T100", "display": "すみません", "answers": ["스미마센"], "meaning": "실례합니다 / 죄송합니다", "category": "여행 단어"}], "hiragana": [{"id": "H001", "display": "あ", "answers": ["아"], "meaning": "히라가나 あ", "category": "히라가나"}, {"id": "H002", "display": "い", "answers": ["이"], "meaning": "히라가나 い", "category": "히라가나"}, {"id": "H003", "display": "う", "answers": ["우"], "meaning": "히라가나 う", "category": "히라가나"}, {"id": "H004", "display": "え", "answers": ["에"], "meaning": "히라가나 え", "category": "히라가나"}, {"id": "H005", "display": "お", "answers": ["오"], "meaning": "히라가나 お", "category": "히라가나"}, {"id": "H006", "display": "か", "answers": ["카"], "meaning": "히라가나 か", "category": "히라가나"}, {"id": "H007", "display": "き", "answers": ["키"], "meaning": "히라가나 き", "category": "히라가나"}, {"id": "H008", "display": "く", "answers": ["쿠"], "meaning": "히라가나 く", "category": "히라가나"}, {"id": "H009", "display": "け", "answers": ["케"], "meaning": "히라가나 け", "category": "히라가나"}, {"id": "H010", "display": "こ", "answers": ["코"], "meaning": "히라가나 こ", "category": "히라가나"}, {"id": "H011", "display": "さ", "answers": ["사"], "meaning": "히라가나 さ", "category": "히라가나"}, {"id": "H012", "display": "し", "answers": ["시"], "meaning": "히라가나 し", "category": "히라가나"}, {"id": "H013", "display": "す", "answers": ["스"], "meaning": "히라가나 す", "category": "히라가나"}, {"id": "H014", "display": "せ", "answers": ["세"], "meaning": "히라가나 せ", "category": "히라가나"}, {"id": "H015", "display": "そ", "answers": ["소"], "meaning": "히라가나 そ", "category": "히라가나"}, {"id": "H016", "display": "た", "answers": ["타"], "meaning": "히라가나 た", "category": "히라가나"}, {"id": "H017", "display": "ち", "answers": ["치"], "meaning": "히라가나 ち", "category": "히라가나"}, {"id": "H018", "display": "つ", "answers": ["츠"], "meaning": "히라가나 つ", "category": "히라가나"}, {"id": "H019", "display": "て", "answers": ["테"], "meaning": "히라가나 て", "category": "히라가나"}, {"id": "H020", "display": "と", "answers": ["토"], "meaning": "히라가나 と", "category": "히라가나"}, {"id": "H021", "display": "な", "answers": ["나"], "meaning": "히라가나 な", "category": "히라가나"}, {"id": "H022", "display": "に", "answers": ["니"], "meaning": "히라가나 に", "category": "히라가나"}, {"id": "H023", "display": "ぬ", "answers": ["누"], "meaning": "히라가나 ぬ", "category": "히라가나"}, {"id": "H024", "display": "ね", "answers": ["네"], "meaning": "히라가나 ね", "category": "히라가나"}, {"id": "H025", "display": "の", "answers": ["노"], "meaning": "히라가나 の", "category": "히라가나"}, {"id": "H026", "display": "は", "answers": ["하"], "meaning": "히라가나 は", "category": "히라가나"}, {"id": "H027", "display": "ひ", "answers": ["히"], "meaning": "히라가나 ひ", "category": "히라가나"}, {"id": "H028", "display": "ふ", "answers": ["후"], "meaning": "히라가나 ふ", "category": "히라가나"}, {"id": "H029", "display": "へ", "answers": ["헤"], "meaning": "히라가나 へ", "category": "히라가나"}, {"id": "H030", "display": "ほ", "answers": ["호"], "meaning": "히라가나 ほ", "category": "히라가나"}, {"id": "H031", "display": "ま", "answers": ["마"], "meaning": "히라가나 ま", "category": "히라가나"}, {"id": "H032", "display": "み", "answers": ["미"], "meaning": "히라가나 み", "category": "히라가나"}, {"id": "H033", "display": "む", "answers": ["무"], "meaning": "히라가나 む", "category": "히라가나"}, {"id": "H034", "display": "め", "answers": ["메"], "meaning": "히라가나 め", "category": "히라가나"}, {"id": "H035", "display": "も", "answers": ["모"], "meaning": "히라가나 も", "category": "히라가나"}, {"id": "H036", "display": "や", "answers": ["야"], "meaning": "히라가나 や", "category": "히라가나"}, {"id": "H037", "display": "ゆ", "answers": ["유"], "meaning": "히라가나 ゆ", "category": "히라가나"}, {"id": "H038", "display": "よ", "answers": ["요"], "meaning": "히라가나 よ", "category": "히라가나"}, {"id": "H039", "display": "ら", "answers": ["라"], "meaning": "히라가나 ら", "category": "히라가나"}, {"id": "H040", "display": "り", "answers": ["리"], "meaning": "히라가나 り", "category": "히라가나"}, {"id": "H041", "display": "る", "answers": ["루"], "meaning": "히라가나 る", "category": "히라가나"}, {"id": "H042", "display": "れ", "answers": ["레"], "meaning": "히라가나 れ", "category": "히라가나"}, {"id": "H043", "display": "ろ", "answers": ["로"], "meaning": "히라가나 ろ", "category": "히라가나"}, {"id": "H044", "display": "わ", "answers": ["와"], "meaning": "히라가나 わ", "category": "히라가나"}, {"id": "H045", "display": "を", "answers": ["오"], "meaning": "히라가나 を", "category": "히라가나"}, {"id": "H046", "display": "ん", "answers": ["응"], "meaning": "히라가나 ん", "category": "히라가나"}], "katakana": [{"id": "K001", "display": "ア", "answers": ["아"], "meaning": "가타카나 ア", "category": "가타카나"}, {"id": "K002", "display": "イ", "answers": ["이"], "meaning": "가타카나 イ", "category": "가타카나"}, {"id": "K003", "display": "ウ", "answers": ["우"], "meaning": "가타카나 ウ", "category": "가타카나"}, {"id": "K004", "display": "エ", "answers": ["에"], "meaning": "가타카나 エ", "category": "가타카나"}, {"id": "K005", "display": "オ", "answers": ["오"], "meaning": "가타카나 オ", "category": "가타카나"}, {"id": "K006", "display": "カ", "answers": ["카"], "meaning": "가타카나 カ", "category": "가타카나"}, {"id": "K007", "display": "キ", "answers": ["키"], "meaning": "가타카나 キ", "category": "가타카나"}, {"id": "K008", "display": "ク", "answers": ["쿠"], "meaning": "가타카나 ク", "category": "가타카나"}, {"id": "K009", "display": "ケ", "answers": ["케"], "meaning": "가타카나 ケ", "category": "가타카나"}, {"id": "K010", "display": "コ", "answers": ["코"], "meaning": "가타카나 コ", "category": "가타카나"}, {"id": "K011", "display": "サ", "answers": ["사"], "meaning": "가타카나 サ", "category": "가타카나"}, {"id": "K012", "display": "シ", "answers": ["시"], "meaning": "가타카나 シ", "category": "가타카나"}, {"id": "K013", "display": "ス", "answers": ["스"], "meaning": "가타카나 ス", "category": "가타카나"}, {"id": "K014", "display": "セ", "answers": ["세"], "meaning": "가타카나 セ", "category": "가타카나"}, {"id": "K015", "display": "ソ", "answers": ["소"], "meaning": "가타카나 ソ", "category": "가타카나"}, {"id": "K016", "display": "タ", "answers": ["타"], "meaning": "가타카나 タ", "category": "가타카나"}, {"id": "K017", "display": "チ", "answers": ["치"], "meaning": "가타카나 チ", "category": "가타카나"}, {"id": "K018", "display": "ツ", "answers": ["츠"], "meaning": "가타카나 ツ", "category": "가타카나"}, {"id": "K019", "display": "テ", "answers": ["테"], "meaning": "가타카나 テ", "category": "가타카나"}, {"id": "K020", "display": "ト", "answers": ["토"], "meaning": "가타카나 ト", "category": "가타카나"}, {"id": "K021", "display": "ナ", "answers": ["나"], "meaning": "가타카나 ナ", "category": "가타카나"}, {"id": "K022", "display": "ニ", "answers": ["니"], "meaning": "가타카나 ニ", "category": "가타카나"}, {"id": "K023", "display": "ヌ", "answers": ["누"], "meaning": "가타카나 ヌ", "category": "가타카나"}, {"id": "K024", "display": "ネ", "answers": ["네"], "meaning": "가타카나 ネ", "category": "가타카나"}, {"id": "K025", "display": "ノ", "answers": ["노"], "meaning": "가타카나 ノ", "category": "가타카나"}, {"id": "K026", "display": "ハ", "answers": ["하"], "meaning": "가타카나 ハ", "category": "가타카나"}, {"id": "K027", "display": "ヒ", "answers": ["히"], "meaning": "가타카나 ヒ", "category": "가타카나"}, {"id": "K028", "display": "フ", "answers": ["후"], "meaning": "가타카나 フ", "category": "가타카나"}, {"id": "K029", "display": "ヘ", "answers": ["헤"], "meaning": "가타카나 ヘ", "category": "가타카나"}, {"id": "K030", "display": "ホ", "answers": ["호"], "meaning": "가타카나 ホ", "category": "가타카나"}, {"id": "K031", "display": "マ", "answers": ["마"], "meaning": "가타카나 マ", "category": "가타카나"}, {"id": "K032", "display": "ミ", "answers": ["미"], "meaning": "가타카나 ミ", "category": "가타카나"}, {"id": "K033", "display": "ム", "answers": ["무"], "meaning": "가타카나 ム", "category": "가타카나"}, {"id": "K034", "display": "メ", "answers": ["메"], "meaning": "가타카나 メ", "category": "가타카나"}, {"id": "K035", "display": "モ", "answers": ["모"], "meaning": "가타카나 モ", "category": "가타카나"}, {"id": "K036", "display": "ヤ", "answers": ["야"], "meaning": "가타카나 ヤ", "category": "가타카나"}, {"id": "K037", "display": "ユ", "answers": ["유"], "meaning": "가타카나 ユ", "category": "가타카나"}, {"id": "K038", "display": "ヨ", "answers": ["요"], "meaning": "가타카나 ヨ", "category": "가타카나"}, {"id": "K039", "display": "ラ", "answers": ["라"], "meaning": "가타카나 ラ", "category": "가타카나"}, {"id": "K040", "display": "リ", "answers": ["리"], "meaning": "가타카나 リ", "category": "가타카나"}, {"id": "K041", "display": "ル", "answers": ["루"], "meaning": "가타카나 ル", "category": "가타카나"}, {"id": "K042", "display": "レ", "answers": ["레"], "meaning": "가타카나 レ", "category": "가타카나"}, {"id": "K043", "display": "ロ", "answers": ["로"], "meaning": "가타카나 ロ", "category": "가타카나"}, {"id": "K044", "display": "ワ", "answers": ["와"], "meaning": "가타카나 ワ", "category": "가타카나"}, {"id": "K045", "display": "ヲ", "answers": ["오"], "meaning": "가타카나 ヲ", "category": "가타카나"}, {"id": "K046", "display": "ン", "answers": ["응"], "meaning": "가타카나 ン", "category": "가타카나"}]};
 
-const kata = [
-["ア","아"],["イ","이"],["ウ","우"],["エ","에"],["オ","오"],
-["カ","카"],["キ","키"],["ク","쿠"],["ケ","케"],["コ","코"],
-["サ","사"],["シ","시"],["ス","스"],["セ","세"],["ソ","소"],
-["タ","타"],["チ","치"],["ツ","츠"],["テ","테"],["ト","토"],
-["ナ","나"],["ニ","니"],["ヌ","누"],["ネ","네"],["ノ","노"],
-["ハ","하"],["ヒ","히"],["フ","후"],["ヘ","헤"],["ホ","호"],
-["マ","마"],["ミ","미"],["ム","무"],["メ","메"],["モ","모"],
-["ヤ","야"],["ユ","유"],["ヨ","요"],
-["ラ","라"],["リ","리"],["ル","루"],["レ","레"],["ロ","로"],
-["ワ","와"],["ヲ","오"],["ン","응"]
-].map(x=>({display:x[0],answers:[x[1]],meaning:`가타카나 ${x[0]}`,category:"가타카나"}));
+const game = document.getElementById("game");
+const input = document.getElementById("input");
 
-const vocab = [
-{display:"いち",answers:["이치"],meaning:"1, 하나",category:"숫자"},
-{display:"に",answers:["니"],meaning:"2, 둘",category:"숫자"},
-{display:"さん",answers:["산"],meaning:"3, 셋",category:"숫자"},
-{display:"よん",answers:["욘"],meaning:"4, 넷",category:"숫자"},
-{display:"ご",answers:["고"],meaning:"5, 다섯",category:"숫자"},
-{display:"ろく",answers:["로쿠"],meaning:"6, 여섯",category:"숫자"},
-{display:"なな",answers:["나나"],meaning:"7, 일곱",category:"숫자"},
-{display:"はち",answers:["하치"],meaning:"8, 여덟",category:"숫자"},
-{display:"きゅう",answers:["큐","큐우"],meaning:"9, 아홉",category:"숫자"},
-{display:"じゅう",answers:["쥬","주","쥬우","주우"],meaning:"10, 열",category:"숫자"},
+let running=false, paused=false, waiting=false;
+let current=null, brick=null, raf=null;
+let spawnTime=0, pauseStarted=0, totalPaused=0;
 
-{display:"げつようび",answers:["게츠요비","게츠요우비"],meaning:"월요일",category:"요일·시간"},
-{display:"かようび",answers:["카요비","카요우비"],meaning:"화요일",category:"요일·시간"},
-{display:"すいようび",answers:["스이요비","스이요우비"],meaning:"수요일",category:"요일·시간"},
-{display:"もくようび",answers:["모쿠요비","모쿠요우비"],meaning:"목요일",category:"요일·시간"},
-{display:"きんようび",answers:["킨요비","킨요우비"],meaning:"금요일",category:"요일·시간"},
-{display:"どようび",answers:["도요비","도요우비"],meaning:"토요일",category:"요일·시간"},
-{display:"にちようび",answers:["니치요비","니치요우비"],meaning:"일요일",category:"요일·시간"},
-{display:"いま",answers:["이마"],meaning:"지금",category:"요일·시간"},
-{display:"なんじ",answers:["난지"],meaning:"몇 시",category:"요일·시간"},
-{display:"じかん",answers:["지칸"],meaning:"시간",category:"요일·시간"},
+let queue=[];
+let baseRemaining=0;
+let retryRemaining=0;
+let cycleNo=0;
 
-{display:"タクシー",answers:["타쿠시","타쿠시이"],meaning:"택시",category:"교통"},
-{display:"えき",answers:["에키"],meaning:"역",category:"교통"},
-{display:"くうこう",answers:["쿠코","쿠우코우","쿠코우"],meaning:"공항",category:"교통"},
-{display:"のりば",answers:["노리바"],meaning:"승강장, 타는 곳",category:"교통"},
-{display:"でんしゃ",answers:["덴샤"],meaning:"전철, 기차",category:"교통"},
-{display:"バス",answers:["바스"],meaning:"버스",category:"교통"},
-{display:"とめてください",answers:["토메테쿠다사이"],meaning:"세워 주세요",category:"교통"},
+let score=0, combo=0, best=0, correct=0, attempts=0, misses=0;
 
-{display:"みぎ",answers:["미기"],meaning:"오른쪽",category:"방향"},
-{display:"ひだり",answers:["히다리"],meaning:"왼쪽",category:"방향"},
-{display:"まっすぐ",answers:["맛스구","맛수구"],meaning:"똑바로, 직진",category:"방향"},
-{display:"まえ",answers:["마에"],meaning:"앞",category:"방향"},
-{display:"うしろ",answers:["우시로"],meaning:"뒤",category:"방향"},
-{display:"となり",answers:["토나리"],meaning:"옆, 이웃",category:"방향"},
-
-{display:"みず",answers:["미즈"],meaning:"물",category:"음식"},
-{display:"ごはん",answers:["고한"],meaning:"밥, 식사",category:"음식"},
-{display:"にく",answers:["니쿠"],meaning:"고기",category:"음식"},
-{display:"さかな",answers:["사카나"],meaning:"생선",category:"음식"},
-{display:"やさい",answers:["야사이"],meaning:"채소",category:"음식"},
-{display:"ビール",answers:["비루","비이루"],meaning:"맥주",category:"음식"},
-{display:"おいしい",answers:["오이시이"],meaning:"맛있다",category:"음식"},
-{display:"メニュー",answers:["메뉴","메뉴우"],meaning:"메뉴",category:"음식"},
-{display:"いくらですか",answers:["이쿠라데스카"],meaning:"얼마입니까?",category:"음식"},
-
-{display:"うれしい",answers:["우레시이"],meaning:"기쁘다",category:"감정·일상"},
-{display:"たのしい",answers:["타노시이"],meaning:"즐겁다",category:"감정·일상"},
-{display:"つかれた",answers:["츠카레타"],meaning:"피곤하다",category:"감정·일상"},
-{display:"ねむい",answers:["네무이"],meaning:"졸리다",category:"감정·일상"},
-{display:"たべる",answers:["타베루"],meaning:"먹다",category:"감정·일상"},
-{display:"のむ",answers:["노무"],meaning:"마시다",category:"감정·일상"},
-
-{display:"こんにちは",answers:["곤니치와","콘니치와"],meaning:"안녕하세요",category:"여행회화"},
-{display:"ありがとう",answers:["아리가토","아리가토우"],meaning:"고마워요",category:"여행회화"},
-{display:"すみません",answers:["스미마센"],meaning:"실례합니다 / 죄송합니다 / 저기요",category:"여행회화"},
-{display:"おねがいします",answers:["오네가이시마스"],meaning:"부탁합니다",category:"여행회화"},
-{display:"わかりません",answers:["와카리마센"],meaning:"모르겠습니다",category:"여행회화"},
-{display:"もういちど",answers:["모이치도","모우이치도"],meaning:"한 번 더",category:"여행회화"},
-
-{display:"かいぎ",answers:["카이기"],meaning:"회의",category:"비즈니스"},
-{display:"よてい",answers:["요테이"],meaning:"예정",category:"비즈니스"},
-{display:"しりょう",answers:["시료","시료우"],meaning:"자료",category:"비즈니스"},
-{display:"かくにん",answers:["카쿠닌"],meaning:"확인",category:"비즈니스"},
-{display:"れんらく",answers:["렌라쿠"],meaning:"연락",category:"비즈니스"}
-];
-
-const topics=["숫자","요일·시간","교통","방향","음식","감정·일상","여행회화","비즈니스"];
-const DROP_DURATION = 15000; // 화면 위에서 바닥까지 정확히 15초
-
-const game=document.getElementById("game"), input=document.getElementById("input");
-let running=false,paused=false,current=null,brick=null,y=0,lastTime=0,spawnTime=0,pauseStarted=0,totalPaused=0,raf=null,waiting=false;
-let questionDeck=[];
-let deckKey="";
-let lastDisplay="";
-let score=0,combo=0,best=0,correct=0,attempts=0,misses=0;
-
-function dayTopic(){
-  const d=new Date();
-  const n=Math.floor(d.getTime()/86400000);
-  return topics[n%topics.length];
+function normalize(s){
+  return (s||"").trim().toLowerCase().replace(/[\s\-._,!?~·'"()]/g,"");
 }
-function updateTopic(){
-  document.getElementById("topic").textContent =
-    document.getElementById("mode").value==="오늘의 학습" ? "오늘 주제: "+dayTopic() : "선택 모드: "+document.getElementById("mode").value;
-}
-function pool(){
-  const m=document.getElementById("mode").value;
-  if(m==="히라가나") return hira;
-  if(m==="가타카나") return kata;
-  if(m==="여행 단어") return vocab.filter(v=>["교통","방향","음식","여행회화","요일·시간"].includes(v.category));
-  if(m==="오늘의 학습"){
-    const p=vocab.filter(v=>v.category===dayTopic());
-    return p.length?p:vocab;
-  }
-  return [...hira,...kata,...vocab];
-}
-function norm(s){return (s||"").trim().toLowerCase().replace(/[\s\-._,!?~·'"()]/g,"");}
-
-function shuffleArray(arr){
+function shuffle(arr){
   const a=[...arr];
   for(let i=a.length-1;i>0;i--){
     const j=Math.floor(Math.random()*(i+1));
@@ -592,224 +423,463 @@ function shuffleArray(arr){
   }
   return a;
 }
-
-function currentDeckKey(){
-  return document.getElementById("mode").value + "|" + dayTopic();
+function pool(){
+  const m=document.getElementById("mode").value;
+  if(m==="sentences") return DATA.sentences;
+  if(m==="travel") return DATA.travel;
+  if(m==="hiragana") return DATA.hiragana;
+  if(m==="katakana") return DATA.katakana;
+  return [...DATA.sentences,...DATA.travel,...DATA.hiragana,...DATA.katakana];
 }
-
-function resetQuestionDeck(){
-  questionDeck=[];
-  deckKey=currentDeckKey();
+function modeLabel(){
+  const m=document.getElementById("mode");
+  return m.options[m.selectedIndex].text;
 }
-
+function buildCycle(){
+  const unique=[];
+  const seen=new Set();
+  for(const item of pool()){
+    if(!seen.has(item.id)){
+      seen.add(item.id);
+      unique.push({...item, _retry:0});
+    }
+  }
+  queue=shuffle(unique);
+  baseRemaining=unique.length;
+  retryRemaining=0;
+  cycleNo++;
+  updateTopic();
+  updateStats();
+}
+function ensureQueue(){
+  if(queue.length===0) buildCycle();
+}
 function nextQuestion(){
-  const key=currentDeckKey();
-
-  if(deckKey!==key){
-    resetQuestionDeck();
-  }
-
-  // 화면에 같은 일본어가 중복되어 보이지 않도록 display 기준으로 한 번 더 정리
-  if(questionDeck.length===0){
-    const uniquePool=[];
-    const seen=new Set();
-
-    for(const item of pool()){
-      if(!seen.has(item.display)){
-        seen.add(item.display);
-        uniquePool.push(item);
-      }
-    }
-
-    questionDeck=shuffleArray(uniquePool);
-
-    // 새 사이클 첫 문제와 직전 사이클 마지막 문제가 같은 경우 자리 교환
-    if(questionDeck.length>1 && questionDeck[questionDeck.length-1].display===lastDisplay){
-      const swapIndex=Math.floor(Math.random()*(questionDeck.length-1));
-      [questionDeck[questionDeck.length-1],questionDeck[swapIndex]]=
-      [questionDeck[swapIndex],questionDeck[questionDeck.length-1]];
-    }
-  }
-
-  const q=questionDeck.pop();
-  lastDisplay=q.display;
+  ensureQueue();
+  const q=queue.shift();
+  if(q._retry) retryRemaining=Math.max(0,retryRemaining-1);
+  else baseRemaining=Math.max(0,baseRemaining-1);
   return q;
 }
 
+/* 틀린 기본문제를 향후 위치에 랜덤하게 정확히 2번 삽입.
+   바로 반복되지 않도록 최소 몇 문제 뒤에 배치하고,
+   두 복습 문제도 가급적 서로 떨어뜨린다. */
+function scheduleTwoRetries(item){
+  if(item._retry) return;
+
+  const makeRetry = n => ({...item, _retry:n});
+
+  function insertOne(retryItem, minGap){
+    const minIndex=Math.min(minGap, queue.length);
+    const maxIndex=queue.length;
+    let idx;
+    if(maxIndex<=minIndex) idx=maxIndex;
+    else idx=minIndex + Math.floor(Math.random()*(maxIndex-minIndex+1));
+    queue.splice(idx,0,retryItem);
+  }
+
+  insertOne(makeRetry(1), Math.min(3, queue.length));
+  insertOne(makeRetry(2), Math.min(7, queue.length));
+  retryRemaining += 2;
+  updateStats();
+}
+
+function updateTopic(){
+  document.getElementById("topic").textContent =
+    `${modeLabel()} · ${Number(document.getElementById("duration").value)/1000}초 · ${cycleNo||1}회차`;
+}
+function updateStats(){
+  document.getElementById("score").textContent=`점수 ${score}`;
+  document.getElementById("stats").textContent=`정답 ${correct} / 시도 ${attempts}`;
+  document.getElementById("combo").textContent=`콤보 ${combo} · 최고 ${best}`;
+  document.getElementById("miss").textContent=`시간 초과 ${misses}`;
+  document.getElementById("cycleInfo").textContent=`기본 문제 남음 ${baseRemaining} · 오답 복습 남음 ${retryRemaining}`;
+}
+function clearFeedback(){
+  document.getElementById("answerJP").textContent="—";
+  document.getElementById("answerKR").textContent="발음: —";
+  document.getElementById("meaning").textContent="뜻: —";
+  const r=document.getElementById("result");
+  r.textContent="";
+  r.className="result";
+}
+function startGame(){
+  if(running && !paused) return;
+  if(!running){
+    running=true;
+    paused=false;
+    if(queue.length===0) buildCycle();
+    spawn();
+  }else{
+    paused=false;
+    document.getElementById("pause").textContent="Ⅱ 일시정지";
+    if(!waiting){
+      totalPaused += performance.now()-pauseStarted;
+      raf=requestAnimationFrame(loop);
+    }
+  }
+}
 function spawn(){
-  if(!running||paused)return;
+  if(!running||paused) return;
   game.innerHTML="";
   current=nextQuestion();
   brick=document.createElement("div");
   brick.className="brick";
-  brick.textContent=current.display;
-  brick.style.left=(18+Math.random()*64)+"%";
+
+  const text=document.createElement("div");
+  text.textContent=current.display;
+  brick.appendChild(text);
+
+  if(current._retry){
+    const badge=document.createElement("span");
+    badge.className="retryBadge";
+    badge.textContent=`오답 복습 ${current._retry}/2`;
+    brick.appendChild(badge);
+  }
+
+  const len=[...current.display].length;
+  if(len>=18) brick.style.fontSize="19px";
+  else if(len>=12) brick.style.fontSize="21px";
+  else if(len>=8) brick.style.fontSize="24px";
+
+  brick.style.left=(14+Math.random()*72)+"%";
   brick.style.top="0px";
   game.appendChild(brick);
-  y=0; waiting=false; totalPaused=0; spawnTime=performance.now(); lastTime=spawnTime; input.value=""; input.focus();
+
+  waiting=false;
+  totalPaused=0;
+  spawnTime=performance.now();
+  input.value="";
+  if(window.innerWidth<=700){ committed=""; ime={cho:null,jung:null,jong:null}; renderIme(); }
+  else input.focus();
+  updateStats();
   raf=requestAnimationFrame(loop);
 }
 function loop(t){
-  if(!running||paused||waiting)return;
+  if(!running||paused||waiting||!brick) return;
+  const duration=Number(document.getElementById("duration").value);
+  const elapsed=t-spawnTime-totalPaused;
+  const maxY=Math.max(0,game.clientHeight-brick.offsetHeight-4);
+  const progress=Math.min(elapsed/duration,1);
+  brick.style.top=(maxY*progress)+"px";
 
-  const elapsed = t - spawnTime - totalPaused;
-  const maxY = game.clientHeight - brick.offsetHeight - 4;
-  const progress = Math.min(elapsed / DROP_DURATION, 1);
-
-  y = maxY * progress;
-  brick.style.top = y + "px";
-
-  if(progress >= 1){
+  if(progress>=1){
     misses++;
-    combo = 0;
-    reveal("시간 초과", false);
+    combo=0;
+    reveal("시간 초과",false,false);
     return;
   }
-
-  raf = requestAnimationFrame(loop);
+  raf=requestAnimationFrame(loop);
 }
-function reveal(msg,ok){
+function submit(){
+  if(!running||paused||waiting||!current) return;
+  const typed=normalize(window.innerWidth<=700 ? imeGetText() : input.value);
+  if(!typed) return;
+
+  attempts++;
+  const ok=current.answers.map(normalize).includes(typed);
+
+  if(ok){
+    correct++;
+    combo++;
+    best=Math.max(best,combo);
+    const gain=100+Math.min(combo,20)*10;
+    score+=gain;
+    reveal(`정답! +${gain}`,true,false);
+  }else{
+    combo=0;
+    score=Math.max(0,score-20);
+    if(!current._retry) scheduleTwoRetries(current);
+    reveal("틀렸습니다",false,true);
+  }
+}
+function reveal(msg,ok,wasWrong){
   waiting=true;
-  if(raf)cancelAnimationFrame(raf);
+  if(raf) cancelAnimationFrame(raf);
+
   document.getElementById("answerJP").textContent=current.display;
   document.getElementById("answerKR").textContent="발음: "+current.answers.join(" / ");
   document.getElementById("meaning").textContent="뜻: "+current.meaning;
-  const r=document.getElementById("result"); r.textContent=msg; r.className="result "+(ok?"ok":"bad");
+
+  const r=document.getElementById("result");
+  r.textContent=msg + (wasWrong && !current._retry ? " · 이후 2회 복습 예정" : "");
+  r.className="result "+(ok?"ok":"bad");
+
   updateStats();
-  setTimeout(()=>{ if(running&&!paused)spawn(); },1150);
+  input.value="";
+  if(window.innerWidth<=700){ committed=""; ime={cho:null,jung:null,jong:null}; renderIme(); }
+
+  setTimeout(()=>{
+    if(running&&!paused) spawn();
+  },1400);
 }
-function submit(){
-  if(!running||paused||waiting||!current)return;
-  const a=norm(input.value); if(!a)return;
-  attempts++;
-  const ok=current.answers.map(norm).includes(a);
-  if(ok){correct++;combo++;best=Math.max(best,combo);const gain=100+Math.min(combo,20)*10;score+=gain;reveal("정답! +"+gain,true);}
-  else{combo=0;score=Math.max(0,score-20);reveal("틀렸습니다",false);}
-}
-function updateStats(){
-  document.getElementById("score").textContent="점수 "+score;
-  document.getElementById("stats").textContent=`정답 ${correct} / 시도 ${attempts}`;
-  document.getElementById("combo").textContent=`콤보 ${combo} · 최고 ${best}`;
-  document.getElementById("miss").textContent=`바닥 놓침 ${misses}`;
-  document.getElementById("cycle").textContent=`현재 사이클 남은 문제 ${questionDeck.length}`;
-}
-document.getElementById("start").onclick=()=>{if(running&&!paused)return;running=true;paused=false;spawn();};
-document.getElementById("pause").onclick=()=>{
-  if(!running)return;
+function togglePause(){
+  if(!running) return;
   paused=!paused;
   document.getElementById("pause").textContent=paused?"▶ 계속":"Ⅱ 일시정지";
-
   if(paused){
-    pauseStarted = performance.now();
+    pauseStarted=performance.now();
     if(raf) cancelAnimationFrame(raf);
   }else if(!waiting){
-    totalPaused += performance.now() - pauseStarted;
+    totalPaused += performance.now()-pauseStarted;
     raf=requestAnimationFrame(loop);
   }
-};
-document.getElementById("reset").onclick=()=>{
-  running=false;paused=false;waiting=false;if(raf)cancelAnimationFrame(raf);game.innerHTML="";
-  score=combo=best=correct=attempts=misses=0;resetQuestionDeck();lastDisplay="";updateStats();
-  document.getElementById("answerJP").textContent="—";
-  document.getElementById("answerKR").textContent="발음: —";
-  document.getElementById("meaning").textContent="뜻: —";
-  document.getElementById("result").textContent="";
-};
+}
+function resetGame(){
+  running=false; paused=false; waiting=false;
+  if(raf) cancelAnimationFrame(raf);
+  queue=[]; baseRemaining=0; retryRemaining=0; cycleNo=0;
+  score=0; combo=0; best=0; correct=0; attempts=0; misses=0;
+  game.innerHTML="";
+  clearFeedback();
+  updateStats();
+  updateTopic();
+}
+function changeMode(){
+  if(raf) cancelAnimationFrame(raf);
+  running=false;paused=false;waiting=false;
+  queue=[];baseRemaining=0;retryRemaining=0;cycleNo=0;
+  game.innerHTML="";
+  clearFeedback();
+  updateStats();
+  updateTopic();
+}
+function changeDuration(){
+  updateTopic();
+  if(running && !waiting){
+    // 현재 문제부터 새 낙하시간을 적용하되 진행률은 처음부터 다시 계산
+    spawnTime=performance.now();
+    totalPaused=0;
+    if(raf) cancelAnimationFrame(raf);
+    raf=requestAnimationFrame(loop);
+  }
+}
+
+document.getElementById("start").onclick=startGame;
+document.getElementById("pause").onclick=togglePause;
+document.getElementById("reset").onclick=resetGame;
 document.getElementById("submit").onclick=submit;
-input.addEventListener("keydown",e=>{if(e.key==="Enter")submit();});
-document.addEventListener("keydown",e=>{if(e.code==="Space"&&document.activeElement!==input){e.preventDefault();document.getElementById("pause").click();}});
-document.getElementById("mode").onchange=()=>{updateTopic();resetQuestionDeck();};
+document.getElementById("mode").onchange=changeMode;
+document.getElementById("duration").onchange=changeDuration;
+input.addEventListener("keydown",e=>{if(e.key==="Enter") submit();});
+
 updateTopic();
+updateStats();
 
-// iOS Chrome/Safari: 주소창/키보드 변화에 맞춘 실제 보이는 영역 보정
-(function(){
-  function updateViewportVars(){
-    const vv = window.visualViewport;
-    if(!vv) return;
-
-    document.documentElement.style.setProperty("--vvh", vv.height + "px");
-
-    const keyboardHeight = Math.max(
-      0,
-      window.innerHeight - vv.height - vv.offsetTop
-    );
-
-    document.documentElement.style.setProperty(
-      "--kb-offset",
-      keyboardHeight > 80 ? keyboardHeight + "px" : "0px"
-    );
-
-    document.body.classList.toggle("keyboard-open", keyboardHeight > 120);
-  }
-
-  if(window.visualViewport){
-    window.visualViewport.addEventListener("resize", updateViewportVars);
-    window.visualViewport.addEventListener("scroll", updateViewportVars);
-  }
-  window.addEventListener("orientationchange", ()=>{
-    setTimeout(updateViewportVars, 250);
-  });
-  window.addEventListener("resize", updateViewportVars);
-  updateViewportVars();
-})();
-
-// 입력창 탭 시 화면이 과도하게 스크롤되는 것을 최소화
-input.addEventListener("focus", ()=>{
-  setTimeout(()=>{
-    window.scrollTo({top:0, behavior:"instant"});
-  }, 80);
+// iOS 주소창/키보드 변화에 맞춰 현재 낙하 위치 보정
+window.addEventListener("resize",()=>{
+  if(!running||waiting||paused||!brick) return;
+  const duration=Number(document.getElementById("duration").value);
+  const elapsed=performance.now()-spawnTime-totalPaused;
+  const maxY=Math.max(0,game.clientHeight-brick.offsetHeight-4);
+  const progress=Math.min(elapsed/duration,1);
+  brick.style.top=(maxY*progress)+"px";
 });
 
-
-// PWA / iPhone 홈 화면 실행
-if ("serviceWorker" in navigator && location.protocol !== "file:") {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(() => {});
+// PWA service worker
+if("serviceWorker" in navigator && location.protocol!=="file:"){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
   });
 }
 
-(function(){
-  const standalone =
-    window.matchMedia("(display-mode: standalone)").matches ||
-    window.navigator.standalone === true;
+/* ===== v5: 화면 한글 자판 IME ===== */
+const CHO = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+const JUNG = ["ㅏ","ㅐ","ㅑ","ㅒ","ㅓ","ㅔ","ㅕ","ㅖ","ㅗ","ㅘ","ㅙ","ㅚ","ㅛ","ㅜ","ㅝ","ㅞ","ㅟ","ㅠ","ㅡ","ㅢ","ㅣ"];
+const JONG = ["","ㄱ","ㄲ","ㄳ","ㄴ","ㄵ","ㄶ","ㄷ","ㄹ","ㄺ","ㄻ","ㄼ","ㄽ","ㄾ","ㄿ","ㅀ","ㅁ","ㅂ","ㅄ","ㅅ","ㅆ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
 
-  const hint = document.getElementById("pwaInstallHint");
-  const close = document.getElementById("closePwaHint");
-  const dismissed = localStorage.getItem("jpGamePwaHintDismissed") === "1";
+const COMBINE_VOWEL = {
+  "ㅗㅏ":"ㅘ","ㅗㅐ":"ㅙ","ㅗㅣ":"ㅚ",
+  "ㅜㅓ":"ㅝ","ㅜㅔ":"ㅞ","ㅜㅣ":"ㅟ",
+  "ㅡㅣ":"ㅢ",
+  "ㅑㅣ":"ㅒ","ㅕㅣ":"ㅖ"
+};
+const SPLIT_VOWEL = {
+  "ㅘ":["ㅗ","ㅏ"],"ㅙ":["ㅗ","ㅐ"],"ㅚ":["ㅗ","ㅣ"],
+  "ㅝ":["ㅜ","ㅓ"],"ㅞ":["ㅜ","ㅔ"],"ㅟ":["ㅜ","ㅣ"],"ㅢ":["ㅡ","ㅣ"],
+  "ㅒ":["ㅑ","ㅣ"],"ㅖ":["ㅕ","ㅣ"]
+};
+const COMBINE_FINAL = {
+  "ㄱㅅ":"ㄳ","ㄴㅈ":"ㄵ","ㄴㅎ":"ㄶ",
+  "ㄹㄱ":"ㄺ","ㄹㅁ":"ㄻ","ㄹㅂ":"ㄼ","ㄹㅅ":"ㄽ","ㄹㅌ":"ㄾ","ㄹㅍ":"ㄿ","ㄹㅎ":"ㅀ",
+  "ㅂㅅ":"ㅄ"
+};
+const SPLIT_FINAL = {
+  "ㄳ":["ㄱ","ㅅ"],"ㄵ":["ㄴ","ㅈ"],"ㄶ":["ㄴ","ㅎ"],
+  "ㄺ":["ㄹ","ㄱ"],"ㄻ":["ㄹ","ㅁ"],"ㄼ":["ㄹ","ㅂ"],"ㄽ":["ㄹ","ㅅ"],"ㄾ":["ㄹ","ㅌ"],"ㄿ":["ㄹ","ㅍ"],"ㅀ":["ㄹ","ㅎ"],
+  "ㅄ":["ㅂ","ㅅ"]
+};
 
-  if (!standalone && !dismissed && hint) {
-    setTimeout(() => { hint.style.display = "block"; }, 1000);
+let ime = {cho:null, jung:null, jong:null};
+let committed = "";
+
+function isConsonant(j){ return CHO.includes(j); }
+function isVowel(j){ return JUNG.includes(j); }
+
+function composeSyllable(cho,jung,jong){
+  if(!cho && !jung) return "";
+  if(!jung) return cho || "";
+  if(!cho) return jung;
+  const ci=CHO.indexOf(cho);
+  const vi=JUNG.indexOf(jung);
+  const fi=JONG.indexOf(jong||"");
+  if(ci<0 || vi<0 || fi<0) return (cho||"")+(jung||"")+(jong||"");
+  return String.fromCharCode(0xAC00 + (ci*21+vi)*28 + fi);
+}
+
+function renderIme(){
+  input.value = committed + composeSyllable(ime.cho, ime.jung, ime.jong);
+}
+
+function commitCurrent(){
+  committed += composeSyllable(ime.cho, ime.jung, ime.jong);
+  ime = {cho:null,jung:null,jong:null};
+}
+
+function typeJamo(j){
+  if(isVowel(j)){
+    if(!ime.cho && !ime.jung){
+      ime.jung=j;
+    }else if(ime.cho && !ime.jung){
+      ime.jung=j;
+    }else if(!ime.cho && ime.jung){
+      const combined=COMBINE_VOWEL[ime.jung+j];
+      if(combined) ime.jung=combined;
+      else{
+        committed += ime.jung;
+        ime.jung=j;
+      }
+    }else if(ime.cho && ime.jung && !ime.jong){
+      const combined=COMBINE_VOWEL[ime.jung+j];
+      if(combined) ime.jung=combined;
+      else{
+        commitCurrent();
+        ime.jung=j;
+      }
+    }else if(ime.cho && ime.jung && ime.jong){
+      let nextCho=ime.jong;
+      if(SPLIT_FINAL[ime.jong]){
+        const [remain,move]=SPLIT_FINAL[ime.jong];
+        ime.jong=remain;
+        committed += composeSyllable(ime.cho,ime.jung,ime.jong);
+        ime={cho:move,jung:j,jong:null};
+      }else{
+        ime.jong=null;
+        committed += composeSyllable(ime.cho,ime.jung,null);
+        ime={cho:nextCho,jung:j,jong:null};
+      }
+    }
+  }else if(isConsonant(j)){
+    if(!ime.cho && !ime.jung){
+      ime.cho=j;
+    }else if(ime.cho && !ime.jung){
+      committed += ime.cho;
+      ime={cho:j,jung:null,jong:null};
+    }else if(!ime.cho && ime.jung){
+      committed += ime.jung;
+      ime={cho:j,jung:null,jong:null};
+    }else if(ime.cho && ime.jung && !ime.jong){
+      if(JONG.includes(j)) ime.jong=j;
+      else{
+        commitCurrent();
+        ime.cho=j;
+      }
+    }else if(ime.cho && ime.jung && ime.jong){
+      const combined=COMBINE_FINAL[ime.jong+j];
+      if(combined){
+        ime.jong=combined;
+      }else{
+        commitCurrent();
+        ime.cho=j;
+      }
+    }
   }
+  renderIme();
+}
 
-  if (close) {
-    close.addEventListener("click", () => {
-      hint.style.display = "none";
-      localStorage.setItem("jpGamePwaHintDismissed", "1");
-    });
+function imeBackspace(){
+  if(ime.jong){
+    if(SPLIT_FINAL[ime.jong]) ime.jong=SPLIT_FINAL[ime.jong][0];
+    else ime.jong=null;
+  }else if(ime.jung){
+    if(SPLIT_VOWEL[ime.jung]) ime.jung=SPLIT_VOWEL[ime.jung][0];
+    else ime.jung=null;
+  }else if(ime.cho){
+    ime.cho=null;
+  }else if(committed){
+    committed=committed.slice(0,-1);
   }
-})();
+  renderIme();
+}
 
+function imeClear(){
+  committed="";
+  ime={cho:null,jung:null,jong:null};
+  renderIme();
+}
 
-// 간단한 학습 기록 저장
-window.addEventListener("beforeunload", () => {
-  try {
-    localStorage.setItem("jpBrickGameStats", JSON.stringify({
-      score, best, correct, attempts, misses
-    }));
-  } catch(e) {}
+function imeSpace(){
+  commitCurrent();
+  committed += " ";
+  renderIme();
+}
+
+function imeGetText(){
+  return committed + composeSyllable(ime.cho,ime.jung,ime.jong);
+}
+
+function imeSetText(t){
+  committed=t || "";
+  ime={cho:null,jung:null,jong:null};
+  renderIme();
+}
+
+document.querySelectorAll("#hangulKeyboard .hkey").forEach(btn=>{
+  btn.addEventListener("touchstart",e=>e.preventDefault(),{passive:false});
+  btn.addEventListener("click",()=>{
+    const key=btn.dataset.key;
+    const action=btn.dataset.action;
+    if(key) typeJamo(key);
+    else if(action==="backspace") imeBackspace();
+    else if(action==="clear") imeClear();
+    else if(action==="space") imeSpace();
+    else if(action==="submit") submit();
+  });
 });
 
-try {
-  const saved = JSON.parse(localStorage.getItem("jpBrickGameStats") || "null");
-  if (saved) {
-    score = Number(saved.score || 0);
-    best = Number(saved.best || 0);
-    correct = Number(saved.correct || 0);
-    attempts = Number(saved.attempts || 0);
-    misses = Number(saved.misses || 0);
-    updateStats();
+// 모바일에서는 시스템 키보드를 절대 띄우지 않음
+input.addEventListener("focus",()=>{
+  if(window.innerWidth<=700) input.blur();
+});
+
+// PC에서는 물리 키보드 입력도 계속 허용
+document.addEventListener("keydown",e=>{
+  if(window.innerWidth<=700) return;
+  if(e.key==="Enter"){
+    submit();
   }
-} catch(e) {}
+});
+
+// 기존 게임이 input.value를 직접 비울 때 IME 상태도 함께 비우기
+const originalSpawn = spawn;
+spawn = function(){
+  imeClear();
+  originalSpawn();
+};
+
+
+function syncInputReadonly(){
+  if(window.innerWidth<=700){
+    input.setAttribute("readonly","readonly");
+    input.setAttribute("inputmode","none");
+  }else{
+    input.removeAttribute("readonly");
+    input.setAttribute("inputmode","text");
+  }
+}
+window.addEventListener("resize",syncInputReadonly);
+syncInputReadonly();
 
 </script>
 </body>
